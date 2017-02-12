@@ -35,3 +35,16 @@ CREATE TABLE IF NOT EXISTS `teams` (
   PRIMARY KEY (`teamid`),
   FOREIGN KEY (`organizationid`) REFERENCES `organizations` (`organizationid`) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- -----------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `players` (
+  `playerid`			int(10) unsigned 		NOT NULL AUTO_INCREMENT,
+  `teamid` 				int(10) unsigned 		NOT NULL,
+  `name` 				varchar(200) 			NOT NULL,
+  `birth` 				date 					NOT NULL,
+  `height` 				int(11) 				NOT NULL,
+  `weight` 				int(11) 				NOT NULL,
+  `number` 				int(11) 				NOT NULL,
+  PRIMARY KEY (`playerid`),
+  FOREIGN KEY (`teamid`) REFERENCES `teams` (`teamid`) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
