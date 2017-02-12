@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = BBDigitalMinutes
 TEMPLATE = app
 
+RESOURCES   += bbdigitalminutes.qrc
+RC_FILE      = bbdigitalminutes.rc
 
 SOURCES += main.cpp\
         mainwindow.cpp
