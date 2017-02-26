@@ -21,6 +21,9 @@
 //===========================================================================================================
 cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QString p_qsPlayerName)
 {
+    nPlayerNumber   = p_qsPlayerNumber.toInt();
+    qsPlayerName    = p_qsPlayerName;
+
     setParent( p_poParent );
 
     QFont   qfPlayer;
@@ -47,7 +50,7 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     lblPlayerNumber->setObjectName( QString::fromUtf8( "lblPlayerNumber" ) );
     lblPlayerNumber->setGeometry( 2, 2, 26, 26 );
     lblPlayerNumber->setFont( qfPlayer );
-    lblPlayerNumber->setText( QString( "%1" ).arg( p_qsPlayerNumber.toInt(), 2, 10, QChar( '0' ) ) );
+    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber, 2, 10, QChar( '0' ) ) );
 
 /*    hlPlayerNumber = new QHBoxLayout( frmPlayerNumber );
     hlPlayerNumber->setObjectName( QString::fromUtf8( "hlPlayerNumber" ) );
@@ -69,7 +72,7 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     lblPlayerName->setObjectName( QString::fromUtf8( "lblPlayerName" ) );
     lblPlayerName->setGeometry( 2, 2, 70, 26 );
     lblPlayerName->setFont( qfPlayer );
-    lblPlayerName->setText( p_qsPlayerName );
+    lblPlayerName->setText( qsPlayerName );
 
     hlPlayerName = new QHBoxLayout( frmPlayerName );
     hlPlayerName->setObjectName( QString::fromUtf8( "hlPlayerName" ) );
@@ -133,7 +136,37 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     hlPlayer->addWidget( frmFault );
 }
 
+//===========================================================================================================
+int cPanelPlayer::playerNumber()
+{
+    return nPlayerNumber;
+}
 
+//===========================================================================================================
+QString cPanelPlayer::playerName()
+{
+    return qsPlayerName;
+}
+
+//===========================================================================================================
+QString cPanelPlayer::playerWithNumber( QString p_qsSeparator )
+{
+    return QString( "%1%2%3" ).arg( nPlayerNumber ).arg( p_qsSeparator ).arg( qsPlayerName );
+}
+
+//====================================================================================
+void cPanelPlayer::mousePressEvent ( QMouseEvent *p_poEvent )
+{
+    emit playerClicked( this );
+    p_poEvent->ignore();
+}
+
+
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Main window
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 
 //===========================================================================================================
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -186,6 +219,12 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
         if( bTeamHomePlay )         _updateTeamHomePlayTime();
         else if( bTeamGuestPlay )   _updateTeamGuestPlayTime();
     }
+}
+
+//===========================================================================================================
+void MainWindow::slotPlayerPanelClicked( cPanelPlayer *poPlayerPanel )
+{
+    QMessageBox::information( this, "", poPlayerPanel->playerWithNumber() );
 }
 
 //===========================================================================================================
@@ -321,6 +360,8 @@ void MainWindow::_addPlayersToHome()
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
+                connect( poPlayer, SIGNAL(playerClicked(int)), this, SLOT(slotPlayerPanelClicked(int)) );
+
                 ui->vlPlayersHome->insertWidget( qvPanelPlayersHome.size(), poPlayer );
                 qvPanelPlayersHome.append( poPlayer );
             }
@@ -343,6 +384,8 @@ void MainWindow::_addPlayersToGuest()
             if( qsName.length() > 0 )
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
+
+                connect( poPlayer, SIGNAL(playerClicked(int)), this, SLOT(slotPlayerPanelClicked(int)) );
 
                 ui->vlPlayersGuest->insertWidget( qvPanelPlayersGuest.size(), poPlayer );
                 qvPanelPlayersGuest.append( poPlayer );
@@ -538,6 +581,7 @@ void MainWindow::on_pbTeamHome_clicked()
     }
 }
 
+//===========================================================================================================
 void MainWindow::on_pbTeamGuest_clicked()
 {
     QMenu   qmMenu;

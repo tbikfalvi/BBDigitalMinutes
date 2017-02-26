@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QSystemTrayIcon>
 #include <QStringList>
+#include <QMouseEvent>
 
 class cPanelPlayer : public QFrame
 {
@@ -30,6 +31,20 @@ public:
 
     cPanelPlayer( QWidget *p_poParent = 0, QString p_qsPlayerNumber = "", QString p_qsPlayerName = "" );
 
+    int              playerNumber();
+    QString          playerName();
+    QString          playerWithNumber( QString p_qsSeparator = "\t" );
+
+signals:
+    void playerClicked( cPanelPlayer *poThis );
+
+protected:
+    void mousePressEvent ( QMouseEvent *p_poEvent );
+
+private:
+    int              nPlayerNumber;
+    QString          qsPlayerName;
+
 };
 
 namespace Ui { class MainWindow; }
@@ -46,6 +61,8 @@ protected:
     void timerEvent( QTimerEvent *p_poEvent );
 
 private slots:
+    void slotPlayerPanelClicked( cPanelPlayer *poPlayerPanel );
+
     void on_pbContinueMainTimer_clicked();
     void on_pbSignalReferee_clicked();
     void on_pbEditMainTime_clicked();
