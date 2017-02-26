@@ -13,10 +13,13 @@ class cPanelPlayer : public QFrame
 
 public:
     QHBoxLayout     *hlPlayer;
+    QHBoxLayout     *hlPlayerNumber;
     QFrame          *frmPlayerNumber;
     QLabel          *lblPlayerNumber;
+    QHBoxLayout     *hlPlayerName;
     QFrame          *frmPlayerName;
     QLabel          *lblPlayerName;
+    QHBoxLayout     *hlFault;
     QFrame          *frmFault;
     QLabel          *lblPlayerFault1;
     QLabel          *lblPlayerFault2;
@@ -60,6 +63,8 @@ private:
 
     Ui::MainWindow          *ui;
     QSystemTrayIcon         *m_stIcon;
+    QVector<cPanelPlayer*>   qvPanelPlayersHome;
+    QVector<cPanelPlayer*>   qvPanelPlayersGuest;
 
     int                      nTimerMainPlayTime;
     int                      nTimeMainMiliSec;

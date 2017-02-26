@@ -10,7 +10,128 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Player panel class
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+
 //===========================================================================================================
+cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QString p_qsPlayerName)
+{
+    setParent( p_poParent );
+
+    QFont   qfPlayer;
+
+    qfPlayer.setPointSize( 10 );
+    qfPlayer.setBold( true );
+
+    hlPlayer = new QHBoxLayout( this );
+    hlPlayer->setObjectName( QString::fromUtf8( "hlPlayer" ) );
+    hlPlayer->setSpacing( 0 );
+    hlPlayer->setMargin( 0 );
+
+    //-------------------------------------------------------------------------------------------------------
+    frmPlayerNumber = new QFrame( this );
+    frmPlayerNumber->setObjectName( QString::fromUtf8( "frmPlayerNumber" ) );
+    frmPlayerNumber->setMinimumWidth( 30 );
+    frmPlayerNumber->setMinimumHeight( 30 );
+    frmPlayerNumber->setMaximumWidth( 30 );
+    frmPlayerNumber->setMaximumHeight( 30 );
+    frmPlayerNumber->setFrameShape( QFrame::Panel );
+    frmPlayerNumber->setFrameShadow( QFrame::Raised );
+
+    lblPlayerNumber = new QLabel( frmPlayerNumber );
+    lblPlayerNumber->setObjectName( QString::fromUtf8( "lblPlayerNumber" ) );
+    lblPlayerNumber->setGeometry( 2, 2, 26, 26 );
+    lblPlayerNumber->setFont( qfPlayer );
+    lblPlayerNumber->setText( QString( "%1" ).arg( p_qsPlayerNumber.toInt(), 2, 10, QChar( '0' ) ) );
+
+/*    hlPlayerNumber = new QHBoxLayout( frmPlayerNumber );
+    hlPlayerNumber->setObjectName( QString::fromUtf8( "hlPlayerNumber" ) );
+    hlPlayerNumber->setSpacing( 1 );
+    hlPlayerNumber->setMargin( 1 );*/
+//    hlPlayerNumber->addWidget( lblPlayerNumber );
+
+    hlPlayer->addWidget( frmPlayerNumber );
+
+    //-------------------------------------------------------------------------------------------------------
+    frmPlayerName = new QFrame( this );
+    frmPlayerName->setObjectName( QString::fromUtf8( "frmPlayerName" ) );
+    frmPlayerName->setMinimumHeight( 30 );
+    frmPlayerName->setMaximumHeight( 30 );
+    frmPlayerName->setFrameShape( QFrame::Panel );
+    frmPlayerName->setFrameShadow( QFrame::Raised );
+
+    lblPlayerName = new QLabel( frmPlayerName );
+    lblPlayerName->setObjectName( QString::fromUtf8( "lblPlayerName" ) );
+    lblPlayerName->setGeometry( 2, 2, 70, 26 );
+    lblPlayerName->setFont( qfPlayer );
+    lblPlayerName->setText( p_qsPlayerName );
+
+    hlPlayerName = new QHBoxLayout( frmPlayerName );
+    hlPlayerName->setObjectName( QString::fromUtf8( "hlPlayerName" ) );
+    hlPlayerName->setSpacing( 1 );
+    hlPlayerName->setMargin( 1 );
+    hlPlayerName->addWidget( lblPlayerName );
+
+    hlPlayer->addWidget( frmPlayerName );
+
+    //-------------------------------------------------------------------------------------------------------
+    frmFault = new QFrame( this );
+    frmFault->setObjectName( QString::fromUtf8( "frmFault" ) );
+    frmFault->setMinimumWidth( 112 );
+    frmFault->setMinimumHeight( 30 );
+    frmFault->setMaximumWidth( 112 );
+    frmFault->setMaximumHeight( 30 );
+    frmFault->setFrameShape( QFrame::Panel );
+    frmFault->setFrameShadow( QFrame::Raised );
+
+    lblPlayerFault1 = new QLabel( frmFault );
+    lblPlayerFault1->setObjectName( QString::fromUtf8( "lblPlayerFault1" ) );
+    lblPlayerFault1->setGeometry( 20, 20, 20, 20 );
+    lblPlayerFault1->setScaledContents( true );
+    lblPlayerFault1->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
+
+    lblPlayerFault2 = new QLabel( frmFault );
+    lblPlayerFault2->setObjectName( QString::fromUtf8( "lblPlayerFault2" ) );
+    lblPlayerFault2->setGeometry( 20, 20, 20, 20 );
+    lblPlayerFault2->setScaledContents( true );
+    lblPlayerFault2->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
+
+    lblPlayerFault3 = new QLabel( frmFault );
+    lblPlayerFault3->setObjectName( QString::fromUtf8( "lblPlayerFault3" ) );
+    lblPlayerFault3->setGeometry( 20, 20, 20, 20 );
+    lblPlayerFault3->setScaledContents( true );
+    lblPlayerFault3->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
+
+    lblPlayerFault4 = new QLabel( frmFault );
+    lblPlayerFault4->setObjectName( QString::fromUtf8( "lblPlayerFault4" ) );
+    lblPlayerFault4->setGeometry( 20, 20, 20, 20 );
+    lblPlayerFault4->setScaledContents( true );
+    lblPlayerFault4->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
+
+    lblPlayerFault5 = new QLabel( frmFault );
+    lblPlayerFault5->setObjectName( QString::fromUtf8( "lblPlayerFault5" ) );
+    lblPlayerFault5->setGeometry( 20, 20, 20, 20 );
+    lblPlayerFault5->setScaledContents( true );
+    lblPlayerFault5->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
+
+    hlFault = new QHBoxLayout( frmFault );
+    hlFault->setObjectName( QString::fromUtf8( "hlFault" ) );
+    hlFault->setSpacing( 2 );
+    hlFault->setMargin( 2 );
+
+    hlFault->addWidget( lblPlayerFault5 );
+    hlFault->addWidget( lblPlayerFault4 );
+    hlFault->addWidget( lblPlayerFault3 );
+    hlFault->addWidget( lblPlayerFault2 );
+    hlFault->addWidget( lblPlayerFault1 );
+
+    hlPlayer->addWidget( frmFault );
+}
+
+
 
 //===========================================================================================================
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -21,6 +142,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     m_stIcon->setIcon( QIcon(":/resources/basketball.png") );
     m_stIcon->show();
+
+    cPanelPlayer    *playerTest = new cPanelPlayer( this, "7", "Bikfalvi Bence" );
+
+    ui->vlPlayersHome->insertWidget( 0, playerTest );
 
     nTimerMainPlayTime      = 0;
     nTimeMainMiliSec        = 600000;
@@ -140,33 +265,6 @@ void MainWindow::_showTrayError( QString p_qsMessage )
     m_stIcon->showMessage( QObject::tr("Information"), p_qsMessage, QSystemTrayIcon::Critical, 5000 );
 }
 
-
-//===========================================================================================================
-//
-//===========================================================================================================
-
-//===========================================================================================================
-cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QString p_qsPlayerName)
-{
-    setParent( p_poParent );
-
-    hlPlayer = new QHBoxLayout( this );
-    hlPlayer->setObjectName( QString::fromUtf8( "hlPlayer" ) );
-    hlPlayer->setSpacing( 0 );
-    hlPlayer->setMargin( 0 );
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-
-    frmPlayerNumber = new QFrame( this );
-    frmPlayerNumber->setObjectName( QString::fromUtf8( "frmPlayerNumber" ) );
-    frmPlayerNumber->setMinimumWidth( 30 );
-    frmPlayerNumber->setMinimumHeight( 30 );
-    frmPlayerNumber->setMaximumWidth( 30 );
-    frmPlayerNumber->setMaximumHeight( 30 );
-    frmPlayerNumber->setFrameShape( QFrame::Panel );
-    frmPlayerNumber->setFrameShadow( QFrame::Raised );
-
-//    hlPlayer->addItem( frmPlayerNumber );
-}
 
 //===========================================================================================================
 // GUI control management procedures
