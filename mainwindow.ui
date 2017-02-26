@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1388</width>
-    <height>861</height>
+    <width>1500</width>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -271,16 +271,13 @@
              <string notr="true">color: rgb(0, 255, 0);</string>
             </property>
             <property name="text">
-             <string>999</string>
+             <string>0</string>
             </property>
             <property name="frame">
              <bool>false</bool>
             </property>
-            <property name="cursorPosition">
-             <number>3</number>
-            </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </widget>
@@ -765,16 +762,16 @@
              <string notr="true">color: rgb(0, 255, 0);</string>
             </property>
             <property name="text">
-             <string>999</string>
+             <string>0</string>
             </property>
             <property name="frame">
              <bool>false</bool>
             </property>
             <property name="cursorPosition">
-             <number>3</number>
+             <number>1</number>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </widget>
@@ -945,6 +942,12 @@
              <size>
               <width>200</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>225</height>
              </size>
             </property>
             <property name="frameShape">
@@ -1555,6 +1558,12 @@
           </item>
           <item>
            <widget class="QFrame" name="frmPlayHome">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>225</height>
+             </size>
+            </property>
             <property name="frameShape">
              <enum>QFrame::Panel</enum>
             </property>
@@ -1712,6 +1721,19 @@
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1720,7 +1742,7 @@
             <property name="maximumSize">
              <size>
               <width>100</width>
-              <height>16777215</height>
+              <height>225</height>
              </size>
             </property>
             <property name="frameShape">
@@ -1995,11 +2017,30 @@
                </widget>
               </widget>
              </item>
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </item>
           <item>
            <widget class="QFrame" name="frmPlayGuest">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>225</height>
+             </size>
+            </property>
             <property name="frameShape">
              <enum>QFrame::Panel</enum>
             </property>
@@ -2154,6 +2195,19 @@
                </property>
               </widget>
              </item>
+             <item>
+              <spacer name="verticalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </item>
@@ -2163,6 +2217,12 @@
              <size>
               <width>200</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>225</height>
              </size>
             </property>
             <property name="frameShape">
@@ -2910,6 +2970,19 @@
                </item>
               </layout>
              </item>
+             <item>
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </item>
@@ -2982,6 +3055,19 @@
                 </size>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -3118,6 +3204,19 @@
                </item>
               </layout>
              </item>
+             <item>
+              <spacer name="verticalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
            </widget>
           </item>
@@ -3250,19 +3349,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item>
-     <spacer name="verticalSpacer_6">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>

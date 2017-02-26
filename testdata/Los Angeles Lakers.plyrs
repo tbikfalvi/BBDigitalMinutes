@@ -2,7 +2,7 @@
 # Lines starts with '#' character will be ignored
 # Every line should contain the following data:
 # Player number: integer value
-# Player name: free text (file coding should be UTF8 or ANSI for the special characters)
+# Player name: free text (file coding should be ANSI for the special characters)
 # Player number | Player name
 1	Russell, D'Angelo (C)
 5	Calderón, José

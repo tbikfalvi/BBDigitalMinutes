@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSystemTrayIcon>
+#include <QStringList>
 
 class cPanelPlayer : public QFrame
 {
@@ -57,13 +58,15 @@ private slots:
     void on_pnIncreaseQuarter_clicked();
     void on_pnDecreaseQuarter_clicked();
     void on_pbTeamHome_clicked();
+    void on_pbTeamGuest_clicked();
 
 private:
 
     Ui::MainWindow          *ui;
     QSystemTrayIcon         *m_stIcon;
-    QVector<cPanelPlayer*>   qvPanelPlayersHome;
-    QVector<cPanelPlayer*>   qvPanelPlayersGuest;
+    QList<cPanelPlayer*>     qvPanelPlayersHome;
+    QList<cPanelPlayer*>     qvPanelPlayersGuest;
+    QStringList              qslImportedPlayers;
 
     int                      nTimerMainPlayTime;
     int                      nTimeMainMiliSec;
@@ -83,6 +86,8 @@ private:
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
     void                    _importPlayersFromFile();
+    void                    _addPlayersToHome();
+    void                    _addPlayersToGuest();
 };
 
 #endif // MAINWINDOW_H

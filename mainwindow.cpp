@@ -145,10 +145,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_stIcon->setIcon( QIcon(":/resources/basketball.png") );
     m_stIcon->show();
 
-    cPanelPlayer    *playerTest = new cPanelPlayer( this, "7", "Bikfalvi Bence" );
-
-    ui->vlPlayersHome->insertWidget( 0, playerTest );
-
     nTimerMainPlayTime      = 0;
     nTimeMainMiliSec        = 600000;
 
@@ -290,7 +286,69 @@ void MainWindow::_importPlayersFromFile()
         qsFile = dlgFileOpen.selectedFiles().at(0).right( dlgFileOpen.selectedFiles().at(0).length()-qsDir.length()-1 );
     }
 
-    QMessageBox::information(this,"",QString("%1\n%2").arg(qsDir).arg(qsFile));
+    QFile   qfPlayers( QString( "%1\\%2" ).arg( qsDir ).arg( qsFile ) );
+
+    if( !qfPlayers.open(QIODevice::ReadOnly | QIODevice::Text) )
+    {
+        return;
+    }
+
+    while( !qfPlayers.atEnd() )
+    {
+        QByteArray qbaLine = qfPlayers.readLine();
+
+        if( !qbaLine.startsWith('#') )
+        {
+            qslImportedPlayers << QString( qbaLine );
+        }
+    }
+    qfPlayers.close();
+}
+
+//====================================================================================
+void MainWindow::_addPlayersToHome()
+{
+    for( int i=0; i<qslImportedPlayers.count(); i++ )
+    {
+        QString qsPlayer = qslImportedPlayers.at( i );
+
+        if( qsPlayer.contains( "\t" ) )
+        {
+            QStringList  qslPlayer  = qsPlayer.split( "\t" );
+            QString      qsName     = QString( qslPlayer.at(1) ).remove("\n");
+
+            if( qsName.length() > 0 )
+            {
+                cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
+
+                ui->vlPlayersHome->insertWidget( qvPanelPlayersHome.size(), poPlayer );
+                qvPanelPlayersHome.append( poPlayer );
+            }
+        }
+    }
+}
+
+//====================================================================================
+void MainWindow::_addPlayersToGuest()
+{
+    for( int i=0; i<qslImportedPlayers.count(); i++ )
+    {
+        QString qsPlayer = qslImportedPlayers.at( i );
+
+        if( qsPlayer.contains( "\t" ) )
+        {
+            QStringList  qslPlayer  = qsPlayer.split( "\t" );
+            QString      qsName     = QString( qslPlayer.at(1) ).remove("\n");
+
+            if( qsName.length() > 0 )
+            {
+                cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
+
+                ui->vlPlayersGuest->insertWidget( qvPanelPlayersGuest.size(), poPlayer );
+                qvPanelPlayersGuest.append( poPlayer );
+            }
+        }
+    }
 }
 
 //===========================================================================================================
@@ -351,20 +409,6 @@ void MainWindow::on_pbSaveMainTime_clicked()
     ui->pbSaveMainTime->setEnabled( false );
     ui->pbCancelSaveMainTime->setEnabled( false );
 
-    QMessageBox::information( this, "", QString( "current: %1\n"
-                                                 "new: %2\n"
-                                                 "min: %3\n"
-                                                 "sec: %4\n"
-                                                 "msec: %5\n"
-                                                 )
-                                                .arg( nTimeMainMiliSec )
-                                                .arg(ui->ledTimeMainMinute->text().toInt()*60000 +
-                                                     ui->ledTimeMainSecond->text().toInt()*1000 +
-                                                     ui->ledTimeMainMiliSecond->text().toInt()*10)
-                                                .arg(ui->ledTimeMainMinute->text().toInt())
-                                                .arg(ui->ledTimeMainSecond->text().toInt())
-                                                .arg(ui->ledTimeMainMiliSecond->text().toInt())
-                                                );
     nTimeMainMiliSec = ui->ledTimeMainMinute->text().toInt()*60000 +
                        ui->ledTimeMainSecond->text().toInt()*1000 +
                        ui->ledTimeMainMiliSecond->text().toInt()*10;
@@ -481,7 +525,36 @@ void MainWindow::on_pbTeamHome_clicked()
     {
         if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
         {
+            qslImportedPlayers = QStringList("");
             _importPlayersFromFile();
+            _addPlayersToHome();
+        }
+        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
+        {
+        }
+        else if( qaRet->text().compare( tr("Load players from database ...") ) == 0 )
+        {
+        }
+    }
+}
+
+void MainWindow::on_pbTeamGuest_clicked()
+{
+    QMenu   qmMenu;
+
+    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
+    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
+    qmMenu.addAction( QIcon( ":/resources/database.png" ), tr("Load players from database ...") );
+
+    QAction *qaRet = qmMenu.exec( QCursor::pos() );
+
+    if( qaRet )
+    {
+        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
+        {
+            qslImportedPlayers = QStringList("");
+            _importPlayersFromFile();
+            _addPlayersToGuest();
         }
         else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
         {
