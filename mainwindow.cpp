@@ -4,6 +4,7 @@
 
 #include <QMessageBox>
 #include <QTimer>
+#include <QMenu>
 
 //===========================================================================================================
 
@@ -435,6 +436,31 @@ void MainWindow::on_pnDecreaseQuarter_clicked()
                                    QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
         {
             ui->ledCountQuarter->setText( QString::number( ui->ledCountQuarter->text().toInt()-1 ) );
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::on_pbTeamHome_clicked()
+{
+    QMenu   qmMenu;
+
+    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
+    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
+    qmMenu.addAction( QIcon( ":/resources/database.png" ), tr("Load players from database ...") );
+
+    QAction *qaRet = qmMenu.exec( QCursor::pos() );
+
+    if( qaRet )
+    {
+        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
+        {
+        }
+        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
+        {
+        }
+        else if( qaRet->text().compare( tr("Load players from database ...") ) == 0 )
+        {
         }
     }
 }

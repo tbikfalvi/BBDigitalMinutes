@@ -59,6 +59,8 @@ private slots:
 
     void on_pnDecreaseQuarter_clicked();
 
+    void on_pbTeamHome_clicked();
+
 private:
 
     Ui::MainWindow          *ui;
