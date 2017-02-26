@@ -1,0 +1,21 @@
+# Players.txt - test file contains records represented by tab separated lines
+# Lines starts with '#' character will be ignored
+# Every line should contain the following data:
+# Player number: integer value
+# Player name: free text (file coding should be UTF8 or ANSI for the special characters)
+# Player number | Player name
+1	McCullough, Chris
+2	Wall, John
+3	Beal, Bradley
+4	House, Danuel
+5	Morris, Markieff
+9	McClellan, Sheldon
+12	Oubre, Kelly
+13	Gortat, Marcin
+14	Smith, Jason
+22	Porter, Otto
+28	Mahinmi, Ian
+31	Satoranský, Tomáš
+32	Ochefu, Daniel
+33	Burke, Trey
+44	Bogdanoviæ, Bojan

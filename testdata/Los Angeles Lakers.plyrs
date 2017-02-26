@@ -1,0 +1,21 @@
+# Players.txt - test file contains records represented by tab separated lines
+# Lines starts with '#' character will be ignored
+# Every line should contain the following data:
+# Player number: integer value
+# Player name: free text (file coding should be UTF8 or ANSI for the special characters)
+# Player number | Player name
+1	Russell, D'Angelo (C)
+5	Calderón, José
+6	Clarkson, Jordan (C)
+11	Ennis, Tyler
+0	Young, Nick
+3	Brewer, Corey
+7	Nance, Larry
+9	Deng, Luol
+14	Ingram, Brandon
+15	Robinson, Thomas
+30	Randle, Julius
+37	World Peace, Metta
+28	Black, Tarik
+20	Mozgov, Timofey
+40	Zubac, Ivica
