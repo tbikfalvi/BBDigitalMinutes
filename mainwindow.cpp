@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QMenu>
+#include <QFileDialog>
 
 //===========================================================================================================
 
@@ -266,6 +267,31 @@ void MainWindow::_showTrayError( QString p_qsMessage )
     m_stIcon->showMessage( QObject::tr("Information"), p_qsMessage, QSystemTrayIcon::Critical, 5000 );
 }
 
+//====================================================================================
+void MainWindow::_importPlayersFromFile()
+{
+    QString     qsDir   = QDir::currentPath();
+    QString     qsFile  = "";
+    QFileDialog dlgFileOpen( this );
+
+    dlgFileOpen.setDirectory( qsDir );
+    dlgFileOpen.setFileMode( QFileDialog::ExistingFile );
+    dlgFileOpen.setOptions( QFileDialog::DontResolveSymlinks );
+    dlgFileOpen.setViewMode( QFileDialog::Detail );
+
+    if( dlgFileOpen.exec() )
+    {
+        qsDir  = dlgFileOpen.directory().absolutePath();
+        qsDir.replace( '/', '\\' );
+        if( qsDir.right(1).compare("\\") == 0 )
+        {
+            qsDir = qsDir.left(qsDir.length()-1);
+        }
+        qsFile = dlgFileOpen.selectedFiles().at(0).right( dlgFileOpen.selectedFiles().at(0).length()-qsDir.length()-1 );
+    }
+
+    QMessageBox::information(this,"",QString("%1\n%2").arg(qsDir).arg(qsFile));
+}
 
 //===========================================================================================================
 // GUI control management procedures
@@ -455,6 +481,7 @@ void MainWindow::on_pbTeamHome_clicked()
     {
         if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
         {
+            _importPlayersFromFile();
         }
         else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
         {

@@ -54,11 +54,8 @@ private slots:
     void on_pbRequestTimeGuest_clicked();
     void on_pbHomePlay_clicked();
     void on_pbGuestPlay_clicked();
-
     void on_pnIncreaseQuarter_clicked();
-
     void on_pnDecreaseQuarter_clicked();
-
     void on_pbTeamHome_clicked();
 
 private:
@@ -85,6 +82,7 @@ private:
     void                    _showTrayInfo( QString p_qsMessage );
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
+    void                    _importPlayersFromFile();
 };
 
 #endif // MAINWINDOW_H
