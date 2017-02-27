@@ -50,7 +50,7 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     lblPlayerNumber->setObjectName( QString::fromUtf8( "lblPlayerNumber" ) );
     lblPlayerNumber->setGeometry( 2, 2, 26, 26 );
     lblPlayerNumber->setFont( qfPlayer );
-    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber, 2, 10, QChar( '0' ) ) );
+    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber ) );//, 2, 10, QChar( '0' ) ) );
 
 /*    hlPlayerNumber = new QHBoxLayout( frmPlayerNumber );
     hlPlayerNumber->setObjectName( QString::fromUtf8( "hlPlayerNumber" ) );
@@ -222,10 +222,18 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
 }
 
 //===========================================================================================================
-void MainWindow::slotPlayerPanelClicked( cPanelPlayer *poPlayerPanel )
+void MainWindow::slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel )
 {
     QMessageBox::information( this, "", QString( "Clicked: %1" ).arg( poPlayerPanel->playerWithNumber() ) );
 }
+
+//===========================================================================================================
+void MainWindow::slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel )
+{
+    QMessageBox::information( this, "", QString( "Clicked: %1" ).arg( poPlayerPanel->playerWithNumber() ) );
+}
+
+
 
 //===========================================================================================================
 void MainWindow::_updateMainPlayTime()
@@ -360,10 +368,24 @@ void MainWindow::_addPlayersToHome()
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
-                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelClicked(cPanelPlayer*)) );
+                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelHomeClicked(cPanelPlayer*)) );
 
-                ui->vlPlayersHome->insertWidget( qvPanelPlayersHome.size(), poPlayer );
-                qvPanelPlayersHome.append( poPlayer );
+                bool bAdded = false;
+                for( int j=0; j<qvPanelPlayersHome.size(); j++ )
+                {
+                    if( poPlayer->playerNumber() < qvPanelPlayersHome.at(j)->playerNumber() )
+                    {
+                        ui->vlPlayersHome->insertWidget( j, poPlayer );
+                        qvPanelPlayersHome.insert( j, poPlayer );
+                        bAdded = true;
+                        break;
+                    }
+                }
+                if( !bAdded )
+                {
+                    ui->vlPlayersHome->insertWidget( qvPanelPlayersHome.size(), poPlayer );
+                    qvPanelPlayersHome.append( poPlayer );
+                }
             }
         }
     }
@@ -385,10 +407,24 @@ void MainWindow::_addPlayersToGuest()
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
-                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelClicked(cPanelPlayer*)) );
+                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelGuestClicked(cPanelPlayer*)) );
 
-                ui->vlPlayersGuest->insertWidget( qvPanelPlayersGuest.size(), poPlayer );
-                qvPanelPlayersGuest.append( poPlayer );
+                bool bAdded = false;
+                for( int j=0; j<qvPanelPlayersGuest.size(); j++ )
+                {
+                    if( poPlayer->playerNumber() < qvPanelPlayersGuest.at(j)->playerNumber() )
+                    {
+                        ui->vlPlayersGuest->insertWidget( j, poPlayer );
+                        qvPanelPlayersGuest.insert( j, poPlayer );
+                        bAdded = true;
+                        break;
+                    }
+                }
+                if( !bAdded )
+                {
+                    ui->vlPlayersGuest->insertWidget( qvPanelPlayersGuest.size(), poPlayer );
+                    qvPanelPlayersGuest.append( poPlayer );
+                }
             }
         }
     }

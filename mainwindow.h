@@ -61,7 +61,8 @@ protected:
     void timerEvent( QTimerEvent *p_poEvent );
 
 private slots:
-    void slotPlayerPanelClicked( cPanelPlayer *poPlayerPanel );
+    void slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel );
+    void slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel );
 
     void on_pbContinueMainTimer_clicked();
     void on_pbSignalReferee_clicked();
