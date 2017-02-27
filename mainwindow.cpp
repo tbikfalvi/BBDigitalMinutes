@@ -224,7 +224,7 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
 //===========================================================================================================
 void MainWindow::slotPlayerPanelClicked( cPanelPlayer *poPlayerPanel )
 {
-    QMessageBox::information( this, "", poPlayerPanel->playerWithNumber() );
+    QMessageBox::information( this, "", QString( "Clicked: %1" ).arg( poPlayerPanel->playerWithNumber() ) );
 }
 
 //===========================================================================================================
@@ -360,7 +360,7 @@ void MainWindow::_addPlayersToHome()
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
-                connect( poPlayer, SIGNAL(playerClicked(int)), this, SLOT(slotPlayerPanelClicked(int)) );
+                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelClicked(cPanelPlayer*)) );
 
                 ui->vlPlayersHome->insertWidget( qvPanelPlayersHome.size(), poPlayer );
                 qvPanelPlayersHome.append( poPlayer );
@@ -385,7 +385,7 @@ void MainWindow::_addPlayersToGuest()
             {
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
-                connect( poPlayer, SIGNAL(playerClicked(int)), this, SLOT(slotPlayerPanelClicked(int)) );
+                connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelClicked(cPanelPlayer*)) );
 
                 ui->vlPlayersGuest->insertWidget( qvPanelPlayersGuest.size(), poPlayer );
                 qvPanelPlayersGuest.append( poPlayer );
@@ -560,7 +560,6 @@ void MainWindow::on_pbTeamHome_clicked()
 
     qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
     qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
-    qmMenu.addAction( QIcon( ":/resources/database.png" ), tr("Load players from database ...") );
 
     QAction *qaRet = qmMenu.exec( QCursor::pos() );
 
@@ -575,9 +574,6 @@ void MainWindow::on_pbTeamHome_clicked()
         else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
         {
         }
-        else if( qaRet->text().compare( tr("Load players from database ...") ) == 0 )
-        {
-        }
     }
 }
 
@@ -588,7 +584,6 @@ void MainWindow::on_pbTeamGuest_clicked()
 
     qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
     qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
-    qmMenu.addAction( QIcon( ":/resources/database.png" ), tr("Load players from database ...") );
 
     QAction *qaRet = qmMenu.exec( QCursor::pos() );
 
@@ -601,9 +596,6 @@ void MainWindow::on_pbTeamGuest_clicked()
             _addPlayersToGuest();
         }
         else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
-        {
-        }
-        else if( qaRet->text().compare( tr("Load players from database ...") ) == 0 )
         {
         }
     }
