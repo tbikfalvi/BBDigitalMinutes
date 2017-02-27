@@ -22,5 +22,6 @@
         <file>resources/cancel.png</file>
         <file>resources/decrease.png</file>
         <file>resources/increase.png</file>
+        <file>resources/folder.png</file>
     </qresource>
 </RCC>
