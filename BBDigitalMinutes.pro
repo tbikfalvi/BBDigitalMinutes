@@ -15,8 +15,11 @@ RESOURCES   += bbdigitalminutes.qrc
 RC_FILE      = bbdigitalminutes.rc
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    dlgplayeredit.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    dlgplayeredit.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dlgplayeredit.ui

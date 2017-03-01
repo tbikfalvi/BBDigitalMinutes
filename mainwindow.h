@@ -15,7 +15,6 @@ class cPanelPlayer : public QFrame
 
 public:
     QHBoxLayout     *hlPlayer;
-    QHBoxLayout     *hlPlayerNumber;
     QFrame          *frmPlayerNumber;
     QLabel          *lblPlayerNumber;
     QHBoxLayout     *hlPlayerName;
@@ -34,6 +33,13 @@ public:
     int              playerNumber();
     QString          playerName();
     QString          playerWithNumber( QString p_qsSeparator = "\t" );
+    void             setPlayerNumber( int p_nPlayerNumber );
+    void             setPlayerName( QString p_qsPlayerName );
+    void             setPlayerToField();
+    void             setPlayerToSubstitute();
+    void             removePlayer();
+
+    bool             isPlayerOnField()                          {   return bPlayerOnField;              }
 
 signals:
     void playerClicked( cPanelPlayer *poThis );
@@ -44,6 +50,7 @@ protected:
 private:
     int              nPlayerNumber;
     QString          qsPlayerName;
+    bool             bPlayerOnField;
 
 };
 
@@ -104,8 +111,15 @@ private:
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
     void                    _importPlayersFromFile();
+    void                    _addPlayerManually( bool addHome = true, bool addMultiplePlayers = false );
+    void                    _addPlayers( bool addHome = true );
     void                    _addPlayersToHome();
     void                    _addPlayersToGuest();
+    void                    _processTeamPopupMenu(bool bHome = true );
+    void                    _processPlayerPopupMenu( cPanelPlayer *poPlayerPanel, bool bHome = true );
+    void                    _reorderPlayersHome();
+    void                    _reorderPlayersGuest();
+    void                    _deletePlayer( cPanelPlayer *poPlayerPanel, bool bHome = true );
 };
 
 #endif // MAINWINDOW_H
