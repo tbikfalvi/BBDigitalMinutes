@@ -31,6 +31,13 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     qsPlayerName    = p_qsPlayerName;
     bPlayerOnField  = false;
 
+    nScores         = 0;
+    nCountSingle    = 0;
+    nCountDouble    = 0;
+    nCountTriple    = 0;
+    nCountFaults    = 0;
+    nCountFaults    = 0;
+
     setParent( p_poParent );
 
     QFont   qfPlayer;
@@ -235,6 +242,58 @@ void cPanelPlayer::removePlayer()
     delete hlPlayer;
 }
 
+//====================================================================================
+void cPanelPlayer::increaseScore( int p_nScore )
+{
+    nScores += p_nScore;
+
+    switch( p_nScore )
+    {
+        case 1:
+            increaseSingle();
+            break;
+        case 2:
+            increaseDouble();
+            break;
+        case 3:
+            increaseTriple();
+            break;
+      default:
+            break;
+    }
+}
+
+//====================================================================================
+void cPanelPlayer::setPlayerFault()
+{
+    nCountFaults++;
+
+    switch( nCountFaults )
+    {
+    case 1:
+        lblPlayerFault1->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
+        break;
+    case 2:
+        lblPlayerFault2->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
+        break;
+    case 3:
+        lblPlayerFault3->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
+        break;
+    case 4:
+        lblPlayerFault4->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
+        break;
+    case 5:
+        lblPlayerFault5->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
+        setPlayerToSubstitute();
+        lblPlayerNumber->setStyleSheet( "QLabel { background: rgb(255, 0, 0); font: bold; color: rgb(255, 255, 255); }" );
+        lblPlayerName->setStyleSheet( "QLabel { background: rgb(255, 0, 0); font: bold; color: rgb(255, 255, 255); }" );
+        emit playerDisqualified();
+        break;
+    default:
+        break;
+    }
+}
+
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 // Main window
@@ -266,6 +325,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nCountPlayerFieldGuest  = 0;
 
     bSubstituteInProgress   = false;
+
+    nScoreHome              = 0;
+    nScoreGuest             = 0;
 
     pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );
 
@@ -311,6 +373,20 @@ void MainWindow::slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel )
 void MainWindow::slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel )
 {
     _processPlayerPopupMenu( poPlayerPanel, false );
+}
+
+//===========================================================================================================
+void MainWindow::slotPlayerHomeDisqualified()
+{
+    on_pbSignalReferee_clicked();
+    nCountPlayerFieldHome--;
+}
+
+//===========================================================================================================
+void MainWindow::slotPlayerGuestDisqualified()
+{
+    on_pbSignalReferee_clicked();
+    nCountPlayerFieldGuest--;
 }
 
 //===========================================================================================================
@@ -494,6 +570,7 @@ void MainWindow::_addPlayersToHome()
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
                 connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelHomeClicked(cPanelPlayer*)) );
+                connect( poPlayer, SIGNAL(playerDisqualified()),         this, SLOT(slotPlayerHomeDisqualified()) );
 
                 bool bAdded = false;
                 for( int j=0; j<qvPanelPlayersHome.size(); j++ )
@@ -533,6 +610,7 @@ void MainWindow::_addPlayersToGuest()
                 cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
 
                 connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelGuestClicked(cPanelPlayer*)) );
+                connect( poPlayer, SIGNAL(playerDisqualified()),         this, SLOT(slotPlayerGuestDisqualified()) );
 
                 bool bAdded = false;
                 for( int j=0; j<qvPanelPlayersGuest.size(); j++ )
@@ -826,6 +904,7 @@ void MainWindow::_processTeamNamePopupMenu(QLabel *poLblName)
 bool MainWindow::_isPlayerAllowedToField(cPanelPlayer *poPlayerPanel, bool bHome)
 {
     if( poPlayerPanel->isPlayerOnField() )  return false;
+    if( !poPlayerPanel->isEnabledToPlay() ) return false;
 
     if( bHome )
     {
@@ -889,7 +968,7 @@ void MainWindow::_selectPlayerFromSubstitute( bool bHome )
     if( bHome ) qlPlayers = &qvPanelPlayersHome;
     else        qlPlayers = &qvPanelPlayersGuest;
 
-    QAction qaTitle( tr("Select player to substitute ..."), &qmMenu );
+    QAction qaTitle( tr("Select player to field ..."), &qmMenu );
     QFont   qfTitle;
     qfTitle.setBold( true );
     qaTitle.setFont( qfTitle );
@@ -899,7 +978,7 @@ void MainWindow::_selectPlayerFromSubstitute( bool bHome )
 
     for( int i=0; i<qlPlayers->size(); i++ )
     {
-        if( !qlPlayers->at(i)->isPlayerOnField() )
+        if( !qlPlayers->at(i)->isPlayerOnField() && qlPlayers->at(i)->isEnabledToPlay() )
         {
             qmMenu.addAction( qlPlayers->at(i)->playerWithNumber(" - ") );
         }
@@ -922,12 +1001,152 @@ void MainWindow::_selectPlayerFromSubstitute( bool bHome )
 }
 
 //===========================================================================================================
+void MainWindow::_increaseTeamScore(int nScoreValue, bool bHome)
+{
+    QList<cPanelPlayer*>    *qlPlayers;
+    QMenu                    qmMenu;
+
+    if( bHome ) qlPlayers = &qvPanelPlayersHome;
+    else        qlPlayers = &qvPanelPlayersGuest;
+
+    QAction qaTitle( tr("Select player ..."), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+
+    for( int i=0; i<qlPlayers->size(); i++ )
+    {
+        if( qlPlayers->at(i)->isPlayerOnField() )
+        {
+            qmMenu.addAction( qlPlayers->at(i)->playerWithNumber(" - ") );
+        }
+    }
+
+    posMenu.setX( QCursor::pos().x() );
+    posMenu.setY( QCursor::pos().y() );
+
+    cPanelPlayer *pPlayer = NULL;
+    do
+    {
+        QAction *qaRet = qmMenu.exec( posMenu );
+
+        if( qaRet && qaRet->text().contains( " - ") )
+        {
+            for( int i=0; i<qlPlayers->size(); i++ )
+            {
+                if( qlPlayers->at(i)->playerNumber() == qaRet->text().split( " - " ).at(0).toInt() )
+                {
+                    pPlayer = qlPlayers->at(i);
+                    break;
+                }
+            }
+        }
+
+        if( pPlayer == NULL )
+        {
+            QMessageBox::warning( this, tr("Warning"),
+                                  tr("Player must be selected to document the score!") );
+        }
+        else
+        {
+            _updateScore( pPlayer, nScoreValue, bHome );
+        }
+
+    } while( pPlayer == NULL );
+}
+
+//===========================================================================================================
+void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome)
+{
+    if( bHome )
+    {
+        nScoreHome += nScoreValue;
+        ui->ledPointsHome->setText( QString::number( nScoreHome ) );
+        on_pbGuestPlay_clicked();
+    }
+    else
+    {
+        nScoreGuest += nScoreValue;
+        ui->ledPointsGuest->setText( QString::number( nScoreGuest ) );
+        on_pbHomePlay_clicked();
+    }
+    poPlayerPanel->increaseScore( nScoreValue );
+}
+
+//===========================================================================================================
+void MainWindow::_setPlayerFault(bool bHome)
+{
+    QList<cPanelPlayer*>    *qlPlayers;
+    QMenu                    qmMenu;
+
+    if( bHome ) qlPlayers = &qvPanelPlayersHome;
+    else        qlPlayers = &qvPanelPlayersGuest;
+
+    QAction qaTitle( tr("Select player ..."), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+
+    for( int i=0; i<qlPlayers->size(); i++ )
+    {
+        if( qlPlayers->at(i)->isPlayerOnField() )
+        {
+            qmMenu.addAction( qlPlayers->at(i)->playerWithNumber(" - ") );
+        }
+    }
+
+    posMenu.setX( QCursor::pos().x() );
+    posMenu.setY( QCursor::pos().y() );
+
+    cPanelPlayer *pPlayer = NULL;
+    do
+    {
+        QAction *qaRet = qmMenu.exec( posMenu );
+
+        if( qaRet && qaRet->text().contains( " - ") )
+        {
+            for( int i=0; i<qlPlayers->size(); i++ )
+            {
+                if( qlPlayers->at(i)->playerNumber() == qaRet->text().split( " - " ).at(0).toInt() )
+                {
+                    pPlayer = qlPlayers->at(i);
+                    break;
+                }
+            }
+        }
+
+        if( pPlayer == NULL )
+        {
+            QMessageBox::warning( this, tr("Warning"),
+                                  tr("Player must be selected to document the fault!") );
+        }
+        else
+        {
+            pPlayer->setPlayerFault();
+        }
+
+    } while( pPlayer == NULL );
+}
+
+//===========================================================================================================
 // GUI control management procedures
 //===========================================================================================================
 
 //===========================================================================================================
 void MainWindow::on_pbContinueMainTimer_clicked()
 {
+    if( nCountPlayerFieldHome < 5 || nCountPlayerFieldGuest < 5 )
+    {
+        QMessageBox::warning( this, tr("Warning"),
+                              tr("5 members from both teams has to be selected!") );
+        return;
+    }
     nTimerMainPlayTime = startTimer( 10 );
     nTimerTeamPlayTime = startTimer( 1000 );
     _resetDeadTime();
@@ -1141,4 +1360,21 @@ void MainWindow::on_pbPlayerChangeGuest_clicked()
             }
         }
     }
+}
+
+void MainWindow::on_pbScore1Home_clicked()  {   _increaseTeamScore( 1, true );      }
+void MainWindow::on_pbScore2Home_clicked()  {   _increaseTeamScore( 2, true );      }
+void MainWindow::on_pbScore3Home_clicked()  {   _increaseTeamScore( 3, true );      }
+void MainWindow::on_pbScore1Guest_clicked() {   _increaseTeamScore( 1, false  );    }
+void MainWindow::on_pbScore2Guest_clicked() {   _increaseTeamScore( 2, false );     }
+void MainWindow::on_pbScore3Guest_clicked() {   _increaseTeamScore( 3, false );     }
+
+void MainWindow::on_pbFaultHome_clicked()
+{
+    _setPlayerFault( true );
+}
+
+void MainWindow::on_pbFaultGuest_clicked()
+{
+    _setPlayerFault( false );
 }
