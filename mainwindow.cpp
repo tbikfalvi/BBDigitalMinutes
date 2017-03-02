@@ -9,6 +9,7 @@
 #include <QList>
 #include <QVBoxLayout>
 #include <QToolTip>
+#include <QSettings>
 
 //===========================================================================================================
 
@@ -17,6 +18,89 @@
 #include "dlgplayeredit.h"
 #include "dlgedit.h"
 
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Player panel class
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+
+//===========================================================================================================
+cSettings::cSettings()
+{
+    QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
+    QSettings   qsetHomeTeam(    QString( "%1/TeamHome.info" ).arg(         QDir::currentPath() ), QSettings::IniFormat );
+    QSettings   qsetGuestTeam(   QString( "%1/TeamGuest.info" ).arg(        QDir::currentPath() ), QSettings::IniFormat );
+
+    // Application settings related
+    m_qsLang                = qsetApplication.value( "Lang",                    "en"    ).toString();
+    m_bIsMinuteClosed       = qsetApplication.value( "MinuteClosed",            "false" ).toBool();
+    m_nWindowLeft           = qsetApplication.value( "MainWindow/Left",         0       ).toInt();
+    m_nWindowTop            = qsetApplication.value( "MainWindow/Top",          0       ).toInt();
+    m_nWindowWidth          = qsetApplication.value( "MainWindow/Width",        1500    ).toInt();
+    m_nWindowHeight         = qsetApplication.value( "MainWindow/Height",       1000    ).toInt();
+    m_nTimeQuarter          = qsetApplication.value( "Game/QuarterTime",        10      ).toInt();
+    m_nTimeTimeout          = qsetApplication.value( "Game/Timeout",            60      ).toInt();
+    m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
+    m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
+
+    if( m_bIsMinuteClosed )
+    {
+        // Reset all info files
+    }
+    else
+    {
+        // Some error occured, reload last known status
+        m_qsNameTeamHome    = qsetHomeTeam.value( "Team/Name", QObject::tr("Team HOME") ).toString();
+    }
+}
+
+//===========================================================================================================
+cSettings::~cSettings()
+{
+    saveAppSettings();
+    saveHomeSettings();
+    saveGuestSettings();
+}
+
+//===========================================================================================================
+void cSettings::saveAppSettings()
+{
+    // Application settings related
+    QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
+
+    qsetApplication.setValue( "Lang",                   m_qsLang                );
+    qsetApplication.setValue( "MinuteClosed",           m_bIsMinuteClosed       );
+    qsetApplication.setValue( "MainWindow/Left",        m_nWindowLeft           );
+    qsetApplication.setValue( "MainWindow/Top",         m_nWindowTop            );
+    qsetApplication.setValue( "MainWindow/Width",       m_nWindowWidth          );
+    qsetApplication.setValue( "MainWindow/Height",      m_nWindowHeight         );
+    qsetApplication.setValue( "Game/QuarterTime",       m_nTimeQuarter          );
+    qsetApplication.setValue( "Game/Timeout",           m_nTimeTimeout          );
+    qsetApplication.setValue( "Game/OffenseTime",       m_nTimeOffense          );
+    qsetApplication.setValue( "Game/OffenseTimeExtend", m_nTimeOffenseExt       );
+}
+
+//===========================================================================================================
+void cSettings::saveHomeSettings()
+{
+    // Home team related
+    QSettings   qsetHomeTeam( QString( "%1/TeamHome.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
+
+}
+
+//===========================================================================================================
+void cSettings::saveGuestSettings()
+{
+    // Guest team related
+    QSettings   qsetGuestTeam( QString( "%1/TeamGuest.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
+
+}
+
+//===========================================================================================================
+void cSettings::createMinute(QString p_qsMinuteName)
+{
+    qsMinuteFileName = QString( "%1.dmin" ).arg( p_qsMinuteName );
+}
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -310,16 +394,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_stIcon->setIcon( QIcon(":/resources/basketball.png") );
     m_stIcon->show();
 
+    poSettings = new cSettings();
+
     nTimerMainPlayTime      = 0;
-    nTimeMainMiliSec        = 600000;
+    nTimeMainMiliSec        = poSettings->timeQuarter() * 60000;
 
     nTimerTimeDead          = 0;
-    nTimeDeadSecond         = 61;
+    nTimeDeadSecond         = poSettings->timeout() + 1;
 
     bTeamHomePlay           = false;
     bTeamGuestPlay          = false;
     nTimerTeamPlayTime      = 0;
-    nTimeTeamPlaySecond     = 24;
+    nTimeTeamPlaySecond     = poSettings->timeOffense();
 
     nCountPlayerFieldHome   = 0;
     nCountPlayerFieldGuest  = 0;
@@ -329,17 +415,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nScoreHome              = 0;
     nScoreGuest             = 0;
 
-    pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );
+    pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
 
     _updateMainPlayTime();
+
+    move( poSettings->left(), poSettings->top() );
+    resize( poSettings->width(), poSettings->height() );
 }
 
 //===========================================================================================================
 MainWindow::~MainWindow()
 {
+    poSettings->setWindowPosSize( x(), y(), width(), height() );
+
     m_stIcon->hide();
 
     delete ui;
+    delete pSoundWhistle;
+    delete poSettings;
 }
 
 //===========================================================================================================
@@ -1377,4 +1470,11 @@ void MainWindow::on_pbFaultHome_clicked()
 void MainWindow::on_pbFaultGuest_clicked()
 {
     _setPlayerFault( false );
+}
+
+void MainWindow::on_pbSettings_clicked()
+{
+    {
+        poSettings->saveAppSettings();
+    }
 }

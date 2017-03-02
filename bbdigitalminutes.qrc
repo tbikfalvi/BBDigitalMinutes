@@ -26,5 +26,9 @@
         <file>resources/basketball_player_in.png</file>
         <file>resources/basketball_player_out.png</file>
         <file>resources/delete.png</file>
+        <file>resources/basketball_attempt.png</file>
+        <file>resources/minutes_new.png</file>
+        <file>resources/reset.png</file>
+        <file>resources/save.png</file>
     </qresource>
 </RCC>

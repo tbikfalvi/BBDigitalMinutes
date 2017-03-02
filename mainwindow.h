@@ -10,6 +10,79 @@
 #include <QMouseEvent>
 #include <QSound>
 
+class cSettings
+{
+
+public:
+    cSettings();
+    ~cSettings();
+
+    // Application settings related
+    QString          language()                                     { return m_qsLang;              }
+    int              left()                                         { return m_nWindowLeft;         }
+    int              top()                                          { return m_nWindowTop;          }
+    int              width()                                        { return m_nWindowWidth;        }
+    int              height()                                       { return m_nWindowHeight;       }
+    int              timeQuarter()                                  { return m_nTimeQuarter;        }
+    int              timeout()                                      { return m_nTimeTimeout;        }
+    int              timeOffense()                                  { return m_nTimeOffense;        }
+    int              timeOffenseExt()                               { return m_nTimeOffenseExt;     }
+
+    void             setAppLang( QString lang )                     { m_qsLang          = lang;     }
+    void             setWindowPosSize( int x, int y, int w, int h ) { m_nWindowLeft     = x;
+                                                                      m_nWindowTop      = y;
+                                                                      m_nWindowWidth    = w;
+                                                                      m_nWindowHeight   = h;        }
+    void             setTimeQuarter( int quarter )                  { m_nTimeQuarter    = quarter;  }
+    void             setTimeout( int timeout )                      { m_nTimeTimeout    = timeout;  }
+    void             setTimeOffense( int offense )                  { m_nTimeOffense    = offense;  }
+    void             setTimeOffenseExt( int ext )                   { m_nTimeOffenseExt = ext;      }
+
+    void             saveAppSettings();
+
+    // Minute related
+    bool             isMinuteClosed()                               { return m_bIsMinuteClosed;     }
+    void             createMinute( QString p_qsMinuteName );
+    void             loadMinute( QString p_qsFileName );
+    void             saveMinute();
+    void             closeMinute();
+
+    void             saveHomeSettings();
+
+    // Home team related
+    QString          nameTeamHome()                                 { return m_qsNameTeamHome;      }
+
+    void             setNameTeamHome( QString name )                { m_qsNameTeamHome  = name;     }
+
+    // Guest team related
+
+    void             saveGuestSettings();
+
+private:
+
+    // Application settings related
+    QString          m_qsLang;
+    int              m_nWindowLeft;
+    int              m_nWindowTop;
+    int              m_nWindowWidth;
+    int              m_nWindowHeight;
+    int              m_nTimeQuarter;
+    int              m_nTimeTimeout;
+    int              m_nTimeOffense;
+    int              m_nTimeOffenseExt;
+
+    // Minute related
+    bool             m_bIsMinuteClosed;
+    QString          qsMinuteFileName;
+
+    // Home team related
+    QString          m_qsNameTeamHome;
+
+    // Guest team related
+    QString          m_qsNameTeamGuest;
+
+};
+
 class cPanelPlayer : public QFrame
 {
     Q_OBJECT
@@ -117,6 +190,7 @@ private slots:
     void on_pbScore3Guest_clicked();
     void on_pbFaultHome_clicked();
     void on_pbFaultGuest_clicked();
+    void on_pbSettings_clicked();
 
 private:
 
@@ -129,6 +203,7 @@ private:
     cPanelPlayer            *pPlayerToSubstitute;
     cPanelPlayer            *pPlayerToField;
     QPoint                   posMenu;
+    cSettings               *poSettings;
 
     QString                  qsTeamNameFromFile;
     int                      nTimerMainPlayTime;
