@@ -3,7 +3,9 @@
 # Every line should contain the following data:
 # Player number: integer value
 # Player name: free text (file coding should be ANSI for the special characters)
+# If player number is '@' the 'Player name' will represent team name
 # Player number | Player name
+@ Los Angeles Lakers
 1	Russell, D'Angelo (C)
 5	Calderón, José
 6	Clarkson, Jordan (C)

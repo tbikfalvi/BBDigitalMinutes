@@ -16,10 +16,13 @@ RC_FILE      = bbdigitalminutes.rc
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dlgplayeredit.cpp
+    dlgplayeredit.cpp \
+    dlgedit.cpp
 
 HEADERS  += mainwindow.h \
-    dlgplayeredit.h
+    dlgplayeredit.h \
+    dlgedit.h
 
 FORMS    += mainwindow.ui \
-    dlgplayeredit.ui
+    dlgplayeredit.ui \
+    dlgedit.ui
