@@ -40,11 +40,15 @@ public:
     void             setPlayerToField();
     void             setPlayerToSubstitute();
     void             removePlayer();
+    void             increaseScore( int p_nScore );
+    void             setPlayerFault();
 
-    bool             isPlayerOnField()                          {   return bPlayerOnField;              }
+    bool             isPlayerOnField()              {   return bPlayerOnField;              }
+    bool             isEnabledToPlay()              {   return (nCountFaults<5?true:false); }
 
 signals:
     void playerClicked( cPanelPlayer *poThis );
+    void playerDisqualified();
 
 protected:
     void mousePressEvent ( QMouseEvent *p_poEvent );
@@ -58,7 +62,15 @@ private:
     int              nPlayerNumber;
     QString          qsPlayerName;
     bool             bPlayerOnField;
+    int              nScores;
+    int              nCountSingle;
+    int              nCountDouble;
+    int              nCountTriple;
+    int              nCountFaults;
 
+    void             increaseSingle()               {   nCountSingle++;                     }
+    void             increaseDouble()               {   nCountDouble++;                     }
+    void             increaseTriple()               {   nCountTriple++;                     }
 };
 
 namespace Ui { class MainWindow; }
@@ -77,6 +89,8 @@ protected:
 private slots:
     void slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel );
     void slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel );
+    void slotPlayerHomeDisqualified();
+    void slotPlayerGuestDisqualified();
 
     void on_pbContinueMainTimer_clicked();
     void on_pbSignalReferee_clicked();
@@ -95,6 +109,14 @@ private slots:
     void on_pbEditTeamGuest_clicked();
     void on_pbPlayerChangeHome_clicked();
     void on_pbPlayerChangeGuest_clicked();
+    void on_pbScore1Home_clicked();
+    void on_pbScore2Home_clicked();
+    void on_pbScore3Home_clicked();
+    void on_pbScore1Guest_clicked();
+    void on_pbScore2Guest_clicked();
+    void on_pbScore3Guest_clicked();
+    void on_pbFaultHome_clicked();
+    void on_pbFaultGuest_clicked();
 
 private:
 
@@ -120,6 +142,8 @@ private:
     int                      nCountPlayerFieldHome;
     int                      nCountPlayerFieldGuest;
     bool                     bSubstituteInProgress;
+    int                      nScoreHome;
+    int                      nScoreGuest;
 
     void                    _updateMainPlayTime();
     void                    _updateTeamHomePlayTime();
@@ -145,6 +169,9 @@ private:
     bool                    _isPlayerAllowedToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _selectPlayerFromField( bool bHome = true );
     void                    _selectPlayerFromSubstitute( bool bHome = true );
+    void                    _increaseTeamScore( int nScoreValue, bool bHome = true );
+    void                    _updateScore( cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome = true );
+    void                    _setPlayerFault( bool bHome = true );
 };
 
 #endif // MAINWINDOW_H
