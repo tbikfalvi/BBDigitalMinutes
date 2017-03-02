@@ -3,7 +3,9 @@
 # Every line should contain the following data:
 # Player number: integer value
 # Player name: free text (file coding should be UTF8 or ANSI for the special characters)
+# If player number is '@' the 'Player name' will represent team name
 # Player number | Player name
+@ Washington Wizards
 1	McCullough, Chris
 2	Wall, John
 3	Beal, Bradley

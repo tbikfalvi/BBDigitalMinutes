@@ -6,11 +6,17 @@
 #include <QTimer>
 #include <QMenu>
 #include <QFileDialog>
+#include <QList>
+#include <QVBoxLayout>
+#include <QToolTip>
 
 //===========================================================================================================
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "dlgplayeredit.h"
+#include "dlgedit.h"
+
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -23,13 +29,14 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
 {
     nPlayerNumber   = p_qsPlayerNumber.toInt();
     qsPlayerName    = p_qsPlayerName;
+    bPlayerOnField  = false;
 
     setParent( p_poParent );
 
     QFont   qfPlayer;
 
     qfPlayer.setPointSize( 10 );
-    qfPlayer.setBold( true );
+//    qfPlayer.setBold( true );
 
     hlPlayer = new QHBoxLayout( this );
     hlPlayer->setObjectName( QString::fromUtf8( "hlPlayer" ) );
@@ -51,12 +58,6 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     lblPlayerNumber->setGeometry( 2, 2, 26, 26 );
     lblPlayerNumber->setFont( qfPlayer );
     lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber ) );//, 2, 10, QChar( '0' ) ) );
-
-/*    hlPlayerNumber = new QHBoxLayout( frmPlayerNumber );
-    hlPlayerNumber->setObjectName( QString::fromUtf8( "hlPlayerNumber" ) );
-    hlPlayerNumber->setSpacing( 1 );
-    hlPlayerNumber->setMargin( 1 );*/
-//    hlPlayerNumber->addWidget( lblPlayerNumber );
 
     hlPlayer->addWidget( frmPlayerNumber );
 
@@ -134,6 +135,16 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
     hlFault->addWidget( lblPlayerFault1 );
 
     hlPlayer->addWidget( frmFault );
+
+    qsFrmPlayerNumber   = frmPlayerNumber->styleSheet();
+    qsLblPlayerNumber   = lblPlayerNumber->styleSheet();
+    qsFrmPlayerName     = frmPlayerName->styleSheet();
+    qsLblPlayerName     = lblPlayerName->styleSheet();
+}
+
+//===========================================================================================================
+cPanelPlayer::~cPanelPlayer()
+{
 }
 
 //===========================================================================================================
@@ -161,6 +172,68 @@ void cPanelPlayer::mousePressEvent ( QMouseEvent *p_poEvent )
     p_poEvent->ignore();
 }
 
+//====================================================================================
+void cPanelPlayer::setPlayerNumber( int p_nPlayerNumber )
+{
+    nPlayerNumber = p_nPlayerNumber;
+    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber ) );
+}
+
+//====================================================================================
+void cPanelPlayer::setPlayerName( QString p_qsPlayerName )
+{
+    qsPlayerName = p_qsPlayerName;
+    lblPlayerName->setText( qsPlayerName );
+}
+
+//====================================================================================
+void cPanelPlayer::setPlayerToField()
+{
+    bPlayerOnField = true;
+    lblPlayerNumber->setStyleSheet( "QLabel { background: rgb(0, 125, 0); font: bold; color: rgb(255, 255, 255); }" );
+    lblPlayerName->setStyleSheet( "QLabel { background: rgb(0, 125, 0); font: bold; color: rgb(255, 255, 255); }" );
+}
+
+//====================================================================================
+void cPanelPlayer::setPlayerToSubstitute()
+{
+    bPlayerOnField = false;
+    frmPlayerNumber->setStyleSheet( qsFrmPlayerNumber );
+    lblPlayerNumber->setStyleSheet( qsLblPlayerNumber );
+    frmPlayerName->setStyleSheet( qsFrmPlayerName );
+    lblPlayerName->setStyleSheet( qsLblPlayerName );
+}
+
+//====================================================================================
+void cPanelPlayer::removePlayer()
+{
+    hlFault->removeWidget( lblPlayerFault1 );
+    hlFault->removeWidget( lblPlayerFault2 );
+    hlFault->removeWidget( lblPlayerFault3 );
+    hlFault->removeWidget( lblPlayerFault4 );
+    hlFault->removeWidget( lblPlayerFault5 );
+
+    hlPlayerName->removeWidget( lblPlayerName );
+
+    hlPlayer->removeWidget( frmPlayerNumber );
+    hlPlayer->removeWidget( frmPlayerName );
+    hlPlayer->removeWidget( frmFault );
+
+    delete lblPlayerFault1;
+    delete lblPlayerFault2;
+    delete lblPlayerFault3;
+    delete lblPlayerFault4;
+    delete lblPlayerFault5;
+    delete frmFault;
+
+    delete lblPlayerName;
+    delete frmPlayerName;
+
+    delete lblPlayerNumber;
+    delete frmPlayerNumber;
+
+    delete hlPlayer;
+}
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -188,6 +261,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     bTeamGuestPlay          = false;
     nTimerTeamPlayTime      = 0;
     nTimeTeamPlaySecond     = 24;
+
+    nCountPlayerFieldHome   = 0;
+    nCountPlayerFieldGuest  = 0;
+
+    bSubstituteInProgress   = false;
+
+    pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );
 
     _updateMainPlayTime();
 }
@@ -224,16 +304,14 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
 //===========================================================================================================
 void MainWindow::slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel )
 {
-    QMessageBox::information( this, "", QString( "Clicked: %1" ).arg( poPlayerPanel->playerWithNumber() ) );
+    _processPlayerPopupMenu( poPlayerPanel, true );
 }
 
 //===========================================================================================================
 void MainWindow::slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel )
 {
-    QMessageBox::information( this, "", QString( "Clicked: %1" ).arg( poPlayerPanel->playerWithNumber() ) );
+    _processPlayerPopupMenu( poPlayerPanel, false );
 }
-
-
 
 //===========================================================================================================
 void MainWindow::_updateMainPlayTime()
@@ -344,12 +422,59 @@ void MainWindow::_importPlayersFromFile()
     {
         QByteArray qbaLine = qfPlayers.readLine();
 
-        if( !qbaLine.startsWith('#') )
+        if( qbaLine.startsWith('@') )
+        {
+            qsTeamNameFromFile = QString( qbaLine );//.split("\t").at(1);
+            qsTeamNameFromFile.remove( "@" );
+            qsTeamNameFromFile.remove( "\t" );
+            qsTeamNameFromFile.remove( "\n" );
+        }
+        else if( !qbaLine.startsWith('#') )
         {
             qslImportedPlayers << QString( qbaLine );
         }
     }
     qfPlayers.close();
+}
+
+//====================================================================================
+void MainWindow::_addPlayerManually(bool addHome, bool addMultiplePlayers)
+{
+    dlgPlayerEdit   obDlgPlayerEdit( this );
+
+    if( addMultiplePlayers )
+    {
+        int nRet;
+        do
+        {
+            qslImportedPlayers = QStringList("");
+            obDlgPlayerEdit.clear();
+            nRet = obDlgPlayerEdit.exec();
+            if( nRet == QDialog::Accepted )
+            {
+                qslImportedPlayers << QString( "%1\t%2" ).arg( obDlgPlayerEdit.playerNumber() ).arg( obDlgPlayerEdit.playerName() );
+                _addPlayers( addHome );
+            }
+
+        } while( nRet == QDialog::Accepted );
+    }
+    else
+    {
+        qslImportedPlayers = QStringList("");
+        obDlgPlayerEdit.clear();
+        if( obDlgPlayerEdit.exec() == QDialog::Accepted )
+        {
+            qslImportedPlayers << QString( "%1\t%2" ).arg( obDlgPlayerEdit.playerNumber() ).arg( obDlgPlayerEdit.playerName() );
+            _addPlayers( addHome );
+        }
+    }
+}
+
+//====================================================================================
+void MainWindow::_addPlayers(bool addHome)
+{
+    if( addHome )   _addPlayersToHome();
+    else            _addPlayersToGuest();
 }
 
 //====================================================================================
@@ -431,6 +556,372 @@ void MainWindow::_addPlayersToGuest()
 }
 
 //===========================================================================================================
+void MainWindow::_processTeamPopupMenu(bool bHome)
+{
+    QMenu   qmMenu;
+    QString qsTitle = tr( "Team GUEST" );
+
+    if( bHome ) qsTitle = tr( "Team HOME" );
+
+    QAction qaTitle( qsTitle, &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
+    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
+
+    QAction *qaRet = qmMenu.exec( QCursor::pos() );
+
+    if( qaRet )
+    {
+        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
+        {
+            qslImportedPlayers = QStringList("");
+            qsTeamNameFromFile = "";
+            _importPlayersFromFile();
+            _addPlayers( bHome );
+            if( qsTeamNameFromFile.length() > 0 )
+            {
+                if( bHome ) ui->lblTeamHome->setText( qsTeamNameFromFile );
+                else        ui->lblTeamGuest->setText( qsTeamNameFromFile );
+            }
+        }
+        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
+        {
+            _addPlayerManually( bHome, true );
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome)
+{
+    QMenu   qmMenu;
+
+    QAction qaTitle( poPlayerPanel->playerWithNumber(" "), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    QAction qaPlayerToField( QIcon( ":/resources/basketball_player_in.png" ),tr("Move player to field ..."), &qmMenu );
+    qaPlayerToField.setEnabled( _isPlayerAllowedToField( poPlayerPanel, bHome ) );
+
+    QAction qaPlayerToSubstitute( QIcon( ":/resources/basketball_player_out.png" ),tr("Move player to substitute ..."), &qmMenu );
+    qaPlayerToSubstitute.setEnabled( poPlayerPanel->isPlayerOnField() );
+
+    QAction qaPlayerEdit( QIcon( ":/resources/edit.png" ), tr("Edit player data ..."), &qmMenu );
+
+    QAction qaPlayerDelete( QIcon( ":/resources/delete.png" ), tr("Delete player from team"), &qmMenu );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaPlayerEdit );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaPlayerToField );
+    qmMenu.addAction( &qaPlayerToSubstitute );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaPlayerDelete );
+
+    QAction *qaRet = qmMenu.exec( QCursor::pos() );
+
+    if( qaRet == &qaPlayerEdit )
+    {
+        dlgPlayerEdit   obDlgPlayerEdit( this, poPlayerPanel->playerNumber(), poPlayerPanel->playerName() );
+
+        if( obDlgPlayerEdit.exec() == QDialog::Accepted )
+        {
+            poPlayerPanel->setPlayerNumber( obDlgPlayerEdit.playerNumber() );
+            poPlayerPanel->setPlayerName( obDlgPlayerEdit.playerName() );
+            if( bHome ) _reorderPlayersHome();
+            else        _reorderPlayersGuest();
+        }
+    }
+    else if( qaRet == &qaPlayerToField )
+    {
+        _setPlayerToField( poPlayerPanel, bHome );
+    }
+    else if( qaRet == &qaPlayerToSubstitute )
+    {
+        _setPlayerToSubstitute( poPlayerPanel, bHome );
+    }
+    else if( qaRet == &qaPlayerDelete )
+    {
+        if( QMessageBox::question( this, tr("Question"),
+                                   tr( "Are you sure you want to delete player\n'%1'\n from the team?" )
+                                       .arg( poPlayerPanel->playerWithNumber(" ") ),
+                                   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+        {
+            _deletePlayer( poPlayerPanel, bHome );
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_reorderPlayersHome()
+{
+    for( int i=0; i<qvPanelPlayersHome.size(); )
+    {
+        if( i+1 < qvPanelPlayersHome.size() )
+        {
+            if( qvPanelPlayersHome.at(i)->playerNumber() > qvPanelPlayersHome.at(i+1)->playerNumber() )
+            {
+                ui->vlPlayersHome->removeWidget( qvPanelPlayersHome.at(i) );
+                ui->vlPlayersHome->insertWidget( i+1, qvPanelPlayersHome.at(i) );
+                qvPanelPlayersHome.swap( i, i+1 );
+            }
+            else
+            {
+                i++;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    for( int i=qvPanelPlayersHome.size()-2; i>-1; )
+    {
+        if( i > -1 )
+        {
+            if( qvPanelPlayersHome.at(i)->playerNumber() > qvPanelPlayersHome.at(i+1)->playerNumber() )
+            {
+                ui->vlPlayersHome->removeWidget( qvPanelPlayersHome.at(i) );
+                ui->vlPlayersHome->insertWidget( i+1, qvPanelPlayersHome.at(i) );
+                qvPanelPlayersHome.swap( i, i+1 );
+            }
+            else
+            {
+                i--;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_reorderPlayersGuest()
+{
+    for( int i=0; i<qvPanelPlayersGuest.size(); )
+    {
+        if( i+1 < qvPanelPlayersGuest.size() )
+        {
+            if( qvPanelPlayersGuest.at(i)->playerNumber() > qvPanelPlayersGuest.at(i+1)->playerNumber() )
+            {
+                ui->vlPlayersGuest->removeWidget( qvPanelPlayersGuest.at(i) );
+                ui->vlPlayersGuest->insertWidget( i+1, qvPanelPlayersGuest.at(i) );
+                qvPanelPlayersGuest.swap( i, i+1 );
+            }
+            else
+            {
+                i++;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    for( int i=qvPanelPlayersGuest.size()-2; i>-1; )
+    {
+        if( i > -1 )
+        {
+            if( qvPanelPlayersGuest.at(i)->playerNumber() > qvPanelPlayersGuest.at(i+1)->playerNumber() )
+            {
+                ui->vlPlayersGuest->removeWidget( qvPanelPlayersGuest.at(i) );
+                ui->vlPlayersGuest->insertWidget( i+1, qvPanelPlayersGuest.at(i) );
+                qvPanelPlayersGuest.swap( i, i+1 );
+            }
+            else
+            {
+                i--;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_deletePlayer(cPanelPlayer *poPlayerPanel, bool bHome)
+{
+    QList<cPanelPlayer*>    *pQLPlayers = NULL;
+    QVBoxLayout             *pQWPlayers = NULL;
+
+    if( bHome )
+    {
+        pQLPlayers = &qvPanelPlayersHome;
+        pQWPlayers = ui->vlPlayersHome;
+    }
+    else
+    {
+        pQLPlayers = &qvPanelPlayersGuest;
+        pQWPlayers = ui->vlPlayersGuest;
+    }
+
+    for( int i=0; i<pQLPlayers->size(); i++ )
+    {
+        if( pQLPlayers->at(i) == poPlayerPanel )
+        {
+            poPlayerPanel->setVisible( false );
+            pQWPlayers->removeWidget( poPlayerPanel );
+            pQLPlayers->removeAt(i);
+//            poPlayerPanel->removePlayer();
+//            delete poPlayerPanel;
+            break;
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome )
+{
+    poPlayerPanel->setPlayerToField();
+
+    if( bHome )
+    {
+        nCountPlayerFieldHome++;
+    }
+    else
+    {
+        nCountPlayerFieldGuest++;
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome )
+{
+    poPlayerPanel->setPlayerToSubstitute();
+
+    if( bHome )
+    {
+        nCountPlayerFieldHome--;
+    }
+    else
+    {
+        nCountPlayerFieldGuest--;
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_processTeamNamePopupMenu(QLabel *poLblName)
+{
+    dlgEdit   obDlgEdit( this );
+
+    obDlgEdit.setName( poLblName->text() );
+    if( obDlgEdit.exec() == QDialog::Accepted )
+    {
+        poLblName->setText( obDlgEdit.name() );
+    }
+}
+
+//===========================================================================================================
+bool MainWindow::_isPlayerAllowedToField(cPanelPlayer *poPlayerPanel, bool bHome)
+{
+    if( poPlayerPanel->isPlayerOnField() )  return false;
+
+    if( bHome )
+    {
+        if( nCountPlayerFieldHome == 5 )    return false;
+    }
+    else
+    {
+        if( nCountPlayerFieldGuest == 5 )   return false;
+    }
+
+    return true;
+}
+
+//===========================================================================================================
+void MainWindow::_selectPlayerFromField( bool bHome )
+{
+    QList<cPanelPlayer*>    *qlPlayers;
+    QMenu                    qmMenu;
+
+    if( bHome ) qlPlayers = &qvPanelPlayersHome;
+    else        qlPlayers = &qvPanelPlayersGuest;
+
+    QAction qaTitle( tr("Select player to substitute ..."), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+
+    for( int i=0; i<qlPlayers->size(); i++ )
+    {
+        if( qlPlayers->at(i)->isPlayerOnField() )
+        {
+            qmMenu.addAction( qlPlayers->at(i)->playerWithNumber(" - ") );
+        }
+    }
+
+    QAction *qaRet = qmMenu.exec( posMenu );
+
+    pPlayerToSubstitute = NULL;
+    if( qaRet && qaRet->text().contains( " - ") )
+    {
+        for( int i=0; i<qlPlayers->size(); i++ )
+        {
+            if( qlPlayers->at(i)->playerNumber() == qaRet->text().split( " - " ).at(0).toInt() )
+            {
+                pPlayerToSubstitute = qlPlayers->at(i);
+                break;
+            }
+        }
+    }
+}
+
+//===========================================================================================================
+void MainWindow::_selectPlayerFromSubstitute( bool bHome )
+{
+    QList<cPanelPlayer*>    *qlPlayers;
+    QMenu                    qmMenu;
+
+    if( bHome ) qlPlayers = &qvPanelPlayersHome;
+    else        qlPlayers = &qvPanelPlayersGuest;
+
+    QAction qaTitle( tr("Select player to substitute ..."), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+
+    for( int i=0; i<qlPlayers->size(); i++ )
+    {
+        if( !qlPlayers->at(i)->isPlayerOnField() )
+        {
+            qmMenu.addAction( qlPlayers->at(i)->playerWithNumber(" - ") );
+        }
+    }
+
+    QAction *qaRet = qmMenu.exec( posMenu );
+
+    pPlayerToField = NULL;
+    if( qaRet && qaRet->text().contains( " - ") )
+    {
+        for( int i=0; i<qlPlayers->size(); i++ )
+        {
+            if( qlPlayers->at(i)->playerNumber() == qaRet->text().split( " - " ).at(0).toInt() )
+            {
+                pPlayerToField = qlPlayers->at(i);
+                break;
+            }
+        }
+    }
+}
+
+//===========================================================================================================
 // GUI control management procedures
 //===========================================================================================================
 
@@ -450,6 +941,7 @@ void MainWindow::on_pbSignalReferee_clicked()
     killTimer( nTimerTeamPlayTime );
     nTimerMainPlayTime = 0;
     nTimerTeamPlayTime = 0;
+    pSoundWhistle->play();
     _showTrayInfo( tr( "Play halted, timer stopped!" ) );
 }
 
@@ -592,47 +1084,61 @@ void MainWindow::on_pnDecreaseQuarter_clicked()
 //===========================================================================================================
 void MainWindow::on_pbTeamHome_clicked()
 {
-    QMenu   qmMenu;
-
-    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
-    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
-
-    QAction *qaRet = qmMenu.exec( QCursor::pos() );
-
-    if( qaRet )
-    {
-        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
-        {
-            qslImportedPlayers = QStringList("");
-            _importPlayersFromFile();
-            _addPlayersToHome();
-        }
-        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
-        {
-        }
-    }
+    _processTeamPopupMenu( true );
 }
 
 //===========================================================================================================
 void MainWindow::on_pbTeamGuest_clicked()
 {
-    QMenu   qmMenu;
+    _processTeamPopupMenu( false );
+}
 
-    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
-    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
+void MainWindow::on_pbEditTeamHome_clicked()
+{
+    _processTeamNamePopupMenu( ui->lblTeamHome );
+}
 
-    QAction *qaRet = qmMenu.exec( QCursor::pos() );
+void MainWindow::on_pbEditTeamGuest_clicked()
+{
+    _processTeamNamePopupMenu( ui->lblTeamGuest );
+}
 
-    if( qaRet )
+void MainWindow::on_pbPlayerChangeHome_clicked()
+{
+    if( nCountPlayerFieldHome > 0 )
     {
-        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
+        posMenu.setX( QCursor::pos().x() );
+        posMenu.setY( QCursor::pos().y() );
+
+        _selectPlayerFromField( true );
+        if( pPlayerToSubstitute != NULL )
         {
-            qslImportedPlayers = QStringList("");
-            _importPlayersFromFile();
-            _addPlayersToGuest();
+            _selectPlayerFromSubstitute( true );
+            if( pPlayerToField != NULL )
+            {
+                pPlayerToSubstitute->setPlayerToSubstitute();
+                pPlayerToField->setPlayerToField();
+            }
         }
-        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
+    }
+}
+
+void MainWindow::on_pbPlayerChangeGuest_clicked()
+{
+    if( nCountPlayerFieldGuest > 0 )
+    {
+        posMenu.setX( QCursor::pos().x() );
+        posMenu.setY( QCursor::pos().y() );
+
+        _selectPlayerFromField( false );
+        if( pPlayerToSubstitute != NULL )
         {
+            _selectPlayerFromSubstitute( false );
+            if( pPlayerToField != NULL )
+            {
+                pPlayerToSubstitute->setPlayerToSubstitute();
+                pPlayerToField->setPlayerToField();
+            }
         }
     }
 }
