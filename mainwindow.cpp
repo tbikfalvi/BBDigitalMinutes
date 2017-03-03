@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QToolTip>
 #include <QSettings>
+#include <QTranslator>
 
 //===========================================================================================================
 
@@ -17,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "dlgplayeredit.h"
 #include "dlgedit.h"
+#include "dlgsettings.h"
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -33,13 +35,20 @@ cSettings::cSettings()
 
     // Application settings related
     m_qsLang                = qsetApplication.value( "Lang",                    "en"    ).toString();
+    m_bReloadSizePos        = qsetApplication.value( "ReloadSizePos",           "false" ).toBool();
+    m_bReloadMinute         = qsetApplication.value( "ReloadMinute",            "false" ).toBool();
+    m_bSoundEnabled         = qsetApplication.value( "SoundEnabled",            "false" ).toBool();
     m_bIsMinuteClosed       = qsetApplication.value( "MinuteClosed",            "false" ).toBool();
     m_nWindowLeft           = qsetApplication.value( "MainWindow/Left",         0       ).toInt();
     m_nWindowTop            = qsetApplication.value( "MainWindow/Top",          0       ).toInt();
     m_nWindowWidth          = qsetApplication.value( "MainWindow/Width",        1500    ).toInt();
     m_nWindowHeight         = qsetApplication.value( "MainWindow/Height",       1000    ).toInt();
+    m_nCountQuarters        = qsetApplication.value( "Game/QuarterCount",       4       ).toInt();
     m_nTimeQuarter          = qsetApplication.value( "Game/QuarterTime",        10      ).toInt();
+    m_bOvertimeEnabled      = qsetApplication.value( "Game/OvertimeEnabled",    true    ).toBool();
+    m_nTimeOvertime         = qsetApplication.value( "Game/Overtime",           5       ).toInt();
     m_nTimeTimeout          = qsetApplication.value( "Game/Timeout",            60      ).toInt();
+    m_bTimeOffenseUsed      = qsetApplication.value( "Game/OffenseTimeUsed",    false   ).toBool();
     m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
     m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
 
@@ -69,13 +78,20 @@ void cSettings::saveAppSettings()
     QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
 
     qsetApplication.setValue( "Lang",                   m_qsLang                );
+    qsetApplication.setValue( "ReloadSizePos",          m_bReloadSizePos        );
+    qsetApplication.setValue( "ReloadMinute",           m_bReloadMinute         );
+    qsetApplication.setValue( "SoundEnabled",           m_bSoundEnabled         );
     qsetApplication.setValue( "MinuteClosed",           m_bIsMinuteClosed       );
     qsetApplication.setValue( "MainWindow/Left",        m_nWindowLeft           );
     qsetApplication.setValue( "MainWindow/Top",         m_nWindowTop            );
     qsetApplication.setValue( "MainWindow/Width",       m_nWindowWidth          );
     qsetApplication.setValue( "MainWindow/Height",      m_nWindowHeight         );
+    qsetApplication.setValue( "Game/QuarterCount",      m_nCountQuarters        );
     qsetApplication.setValue( "Game/QuarterTime",       m_nTimeQuarter          );
+    qsetApplication.setValue( "Game/OvertimeEnabled",   m_bOvertimeEnabled      );
+    qsetApplication.setValue( "Game/Overtime",          m_nTimeOvertime         );
     qsetApplication.setValue( "Game/Timeout",           m_nTimeTimeout          );
+    qsetApplication.setValue( "Game/OffenseTimeUsed",   m_bTimeOffenseUsed      );
     qsetApplication.setValue( "Game/OffenseTime",       m_nTimeOffense          );
     qsetApplication.setValue( "Game/OffenseTimeExtend", m_nTimeOffenseExt       );
 }
@@ -405,7 +421,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     bTeamHomePlay           = false;
     bTeamGuestPlay          = false;
     nTimerTeamPlayTime      = 0;
-    nTimeTeamPlaySecond     = poSettings->timeOffense();
+    nTimeOffense            = poSettings->timeOffense();
 
     nCountPlayerFieldHome   = 0;
     nCountPlayerFieldGuest  = 0;
@@ -415,12 +431,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nScoreHome              = 0;
     nScoreGuest             = 0;
 
+    m_bMinuteInProgress     = false;
+
     pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
 
     _updateMainPlayTime();
 
-    move( poSettings->left(), poSettings->top() );
-    resize( poSettings->width(), poSettings->height() );
+    ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+
+    ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+
+    if( poSettings->isreloadsizepos() )
+    {
+        move( poSettings->left(), poSettings->top() );
+        resize( poSettings->width(), poSettings->height() );
+    }
 }
 
 //===========================================================================================================
@@ -450,9 +481,9 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
     }
     else if( p_poEvent->timerId() == nTimerTeamPlayTime )
     {
-        nTimeTeamPlaySecond --;
-        if( bTeamHomePlay )         _updateTeamHomePlayTime();
-        else if( bTeamGuestPlay )   _updateTeamGuestPlayTime();
+        nTimeOffense --;
+        if( bTeamHomePlay )         _updateTeamHomeOffenseTime();
+        else if( bTeamGuestPlay )   _updateTeamGuestOffenseTime();
     }
 }
 
@@ -473,6 +504,10 @@ void MainWindow::slotPlayerHomeDisqualified()
 {
     on_pbSignalReferee_clicked();
     nCountPlayerFieldHome--;
+    ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
 }
 
 //===========================================================================================================
@@ -480,6 +515,16 @@ void MainWindow::slotPlayerGuestDisqualified()
 {
     on_pbSignalReferee_clicked();
     nCountPlayerFieldGuest--;
+    ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+}
+
+//===========================================================================================================
+void MainWindow::_enableControls()
+{
+
 }
 
 //===========================================================================================================
@@ -491,11 +536,11 @@ void MainWindow::_updateMainPlayTime()
 }
 
 //===========================================================================================================
-void MainWindow::_updateTeamHomePlayTime()
+void MainWindow::_updateTeamHomeOffenseTime()
 {
-    ui->ledTimerPlayHome->setText( QString( "%1" ).arg( nTimeTeamPlaySecond, 2, 10, QChar( '0' ) ) );
+    ui->ledTimerPlayHome->setText( QString( "%1" ).arg( nTimeOffense, 2, 10, QChar( '0' ) ) );
     ui->ledTimerPlayGuest->setText( "00" );
-    if( nTimeTeamPlaySecond < 1 )
+    if( nTimeOffense < 1 )
     {
         _showTrayWarning( tr( "The play time has expired!" ) );
         on_pbSignalReferee_clicked();
@@ -504,11 +549,11 @@ void MainWindow::_updateTeamHomePlayTime()
 }
 
 //===========================================================================================================
-void MainWindow::_updateTeamGuestPlayTime()
+void MainWindow::_updateTeamGuestOffenseTime()
 {
     ui->ledTimerPlayHome->setText( "00" );
-    ui->ledTimerPlayGuest->setText( QString( "%1" ).arg( nTimeTeamPlaySecond, 2, 10, QChar( '0' ) ) );
-    if( nTimeTeamPlaySecond < 1 )
+    ui->ledTimerPlayGuest->setText( QString( "%1" ).arg( nTimeOffense, 2, 10, QChar( '0' ) ) );
+    if( nTimeOffense < 1 )
     {
         _showTrayWarning( tr( "The play time has expired!" ) );
         on_pbSignalReferee_clicked();
@@ -959,10 +1004,18 @@ void MainWindow::_setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome )
     if( bHome )
     {
         nCountPlayerFieldHome++;
+        ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
     }
     else
     {
         nCountPlayerFieldGuest++;
+        ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
     }
 }
 
@@ -974,10 +1027,18 @@ void MainWindow::_setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome
     if( bHome )
     {
         nCountPlayerFieldHome--;
+        ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+        ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
     }
     else
     {
         nCountPlayerFieldGuest--;
+        ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+        ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
     }
 }
 
@@ -1241,7 +1302,7 @@ void MainWindow::on_pbContinueMainTimer_clicked()
         return;
     }
     nTimerMainPlayTime = startTimer( 10 );
-    nTimerTeamPlayTime = startTimer( 1000 );
+    if( poSettings->istimeoffenseused() ) nTimerTeamPlayTime = startTimer( 1000 );
     _resetDeadTime();
     _showTrayInfo( tr( "Play continued, timer is live!" ) );
 }
@@ -1250,10 +1311,13 @@ void MainWindow::on_pbContinueMainTimer_clicked()
 void MainWindow::on_pbSignalReferee_clicked()
 {
     killTimer( nTimerMainPlayTime );
-    killTimer( nTimerTeamPlayTime );
     nTimerMainPlayTime = 0;
-    nTimerTeamPlayTime = 0;
-    pSoundWhistle->play();
+    if( poSettings->istimeoffenseused() )
+    {
+        killTimer( nTimerTeamPlayTime );
+        nTimerTeamPlayTime = 0;
+    }
+    if( poSettings->issoundenabled() ) pSoundWhistle->play();
     _showTrayInfo( tr( "Play halted, timer stopped!" ) );
 }
 
@@ -1336,37 +1400,44 @@ void MainWindow::on_pbRequestTimeGuest_clicked()
 //===========================================================================================================
 void MainWindow::on_pbHomePlay_clicked()
 {
-    if( !bTeamHomePlay )
+    if( !bTeamHomePlay && poSettings->istimeoffenseused() )
     {
         ui->pbHomePlay->setIcon( QIcon(":/resources/basketball.png") );
         ui->pbGuestPlay->setIcon( QIcon(":/resources/basketball_inactive.png") );
         bTeamHomePlay = true;
         bTeamGuestPlay = false;
-        nTimeTeamPlaySecond = 24;
+        nTimeOffense = poSettings->timeOffense();
         if( nTimerMainPlayTime > 0 && nTimerTeamPlayTime == 0 ) nTimerTeamPlayTime = startTimer( 1000 );
-        _updateTeamHomePlayTime();
+        _updateTeamHomeOffenseTime();
     }
 }
 
 //===========================================================================================================
 void MainWindow::on_pbGuestPlay_clicked()
 {
-    if( !bTeamGuestPlay )
+    if( !bTeamGuestPlay && poSettings->istimeoffenseused() )
     {
         ui->pbHomePlay->setIcon( QIcon(":/resources/basketball_inactive.png") );
         ui->pbGuestPlay->setIcon( QIcon(":/resources/basketball.png") );
         bTeamHomePlay = false;
         bTeamGuestPlay = true;
-        nTimeTeamPlaySecond = 24;
+        nTimeOffense = poSettings->timeOffense();
         if( nTimerMainPlayTime > 0 && nTimerTeamPlayTime == 0 ) nTimerTeamPlayTime = startTimer( 1000 );
-        _updateTeamGuestPlayTime();
+        _updateTeamGuestOffenseTime();
     }
 }
 
 //===========================================================================================================
 void MainWindow::on_pnIncreaseQuarter_clicked()
 {
-    if( ui->ledCountQuarter->text().toInt() < 4 )
+    int nCountQuarter = poSettings->countquarters();
+
+    if( poSettings->isovertimeenabled() )
+    {
+        nCountQuarter++;
+    }
+
+    if( ui->ledCountQuarter->text().toInt() < nCountQuarter )
     {
         if( QMessageBox::question( this, tr("Question"),
                                    tr( "Are you sure to jump to the next quarter?\n"
@@ -1374,6 +1445,16 @@ void MainWindow::on_pnIncreaseQuarter_clicked()
                                    QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
         {
             ui->ledCountQuarter->setText( QString::number( ui->ledCountQuarter->text().toInt()+1 ) );
+            if( ui->ledCountQuarter->text().toInt() < poSettings->countquarters()+1 )
+            {
+                nTimeMainMiliSec = poSettings->timeQuarter() * 60000;
+                _updateMainPlayTime();
+            }
+            else
+            {
+                nTimeMainMiliSec = poSettings->timeovertime() * 60000;
+                _updateMainPlayTime();
+            }
         }
     }
 }
@@ -1474,7 +1555,41 @@ void MainWindow::on_pbFaultGuest_clicked()
 
 void MainWindow::on_pbSettings_clicked()
 {
+    dlgSettings obDlgSettings( this, poSettings );
+
+    if( obDlgSettings.exec() == QDialog::Accepted )
     {
+        ui->retranslateUi( this );
         poSettings->saveAppSettings();
+
+        if( !m_bMinuteInProgress )
+        {
+            if( ui->ledCountQuarter->text().toInt() < poSettings->countquarters()+1 )
+            {
+                nTimeMainMiliSec = poSettings->timeQuarter() * 60000;
+                _updateMainPlayTime();
+            }
+            else
+            {
+                nTimeMainMiliSec = poSettings->timeovertime() * 60000;
+                _updateMainPlayTime();
+            }
+
+        }
+    }
+}
+
+void MainWindow::on_pbMinuteNew_clicked()
+{
+    m_bMinuteInProgress = true;
+}
+
+void MainWindow::on_pbAttempt_clicked()
+{
+    if( nTimeOffense < poSettings->timeOffenseExt() )
+    {
+        nTimeOffense = poSettings->timeOffenseExt();
+        if( bTeamHomePlay )         _updateTeamHomeOffenseTime();
+        else if( bTeamGuestPlay )   _updateTeamGuestOffenseTime();
     }
 }

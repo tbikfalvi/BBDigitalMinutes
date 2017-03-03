@@ -18,25 +18,39 @@ public:
     ~cSettings();
 
     // Application settings related
-    QString          language()                                     { return m_qsLang;              }
-    int              left()                                         { return m_nWindowLeft;         }
-    int              top()                                          { return m_nWindowTop;          }
-    int              width()                                        { return m_nWindowWidth;        }
-    int              height()                                       { return m_nWindowHeight;       }
-    int              timeQuarter()                                  { return m_nTimeQuarter;        }
-    int              timeout()                                      { return m_nTimeTimeout;        }
-    int              timeOffense()                                  { return m_nTimeOffense;        }
-    int              timeOffenseExt()                               { return m_nTimeOffenseExt;     }
+    QString          language()                                     { return m_qsLang;                  }
+    bool             isreloadsizepos()                              { return m_bReloadSizePos;          }
+    bool             isreloadminute()                               { return m_bReloadMinute;           }
+    bool             issoundenabled()                               { return m_bSoundEnabled;           }
+    int              left()                                         { return m_nWindowLeft;             }
+    int              top()                                          { return m_nWindowTop;              }
+    int              width()                                        { return m_nWindowWidth;            }
+    int              height()                                       { return m_nWindowHeight;           }
+    int              countquarters()                                { return m_nCountQuarters;          }
+    int              timeQuarter()                                  { return m_nTimeQuarter;            }
+    bool             isovertimeenabled()                            { return m_bOvertimeEnabled;        }
+    int              timeovertime()                                 { return m_nTimeOvertime;           }
+    int              timeout()                                      { return m_nTimeTimeout;            }
+    bool             istimeoffenseused()                            { return m_bTimeOffenseUsed;        }
+    int              timeOffense()                                  { return m_nTimeOffense;            }
+    int              timeOffenseExt()                               { return m_nTimeOffenseExt;         }
 
-    void             setAppLang( QString lang )                     { m_qsLang          = lang;     }
-    void             setWindowPosSize( int x, int y, int w, int h ) { m_nWindowLeft     = x;
-                                                                      m_nWindowTop      = y;
-                                                                      m_nWindowWidth    = w;
-                                                                      m_nWindowHeight   = h;        }
-    void             setTimeQuarter( int quarter )                  { m_nTimeQuarter    = quarter;  }
-    void             setTimeout( int timeout )                      { m_nTimeTimeout    = timeout;  }
-    void             setTimeOffense( int offense )                  { m_nTimeOffense    = offense;  }
-    void             setTimeOffenseExt( int ext )                   { m_nTimeOffenseExt = ext;      }
+    void             setAppLang( QString lang )                     { m_qsLang              = lang;     }
+    void             setReloadSizePos( bool reload )                { m_bReloadSizePos      = reload;   }
+    void             setReloadMinute( bool reload )                 { m_bReloadMinute       = reload;   }
+    void             setSoundEnabled( bool enabled )                { m_bSoundEnabled       = enabled;  }
+    void             setWindowPosSize( int x, int y, int w, int h ) { m_nWindowLeft         = x;
+                                                                      m_nWindowTop          = y;
+                                                                      m_nWindowWidth        = w;
+                                                                      m_nWindowHeight       = h;        }
+    void             setCountQuarters( int count )                  { m_nCountQuarters      = count;    }
+    void             setTimeQuarter( int quarter )                  { m_nTimeQuarter        = quarter;  }
+    void             setOvertimeEnabled( bool enabled )             { m_bOvertimeEnabled    = enabled;  }
+    void             setTimeOvertime( int time )                    { m_nTimeOvertime       = time;     }
+    void             setTimeout( int timeout )                      { m_nTimeTimeout        = timeout;  }
+    void             setTimeOffenseUsed( bool enabled )             { m_bTimeOffenseUsed    = enabled;  }
+    void             setTimeOffense( int offense )                  { m_nTimeOffense        = offense;  }
+    void             setTimeOffenseExt( int ext )                   { m_nTimeOffenseExt     = ext;      }
 
     void             saveAppSettings();
 
@@ -62,12 +76,19 @@ private:
 
     // Application settings related
     QString          m_qsLang;
+    bool             m_bReloadSizePos;
+    bool             m_bReloadMinute;
+    bool             m_bSoundEnabled;
     int              m_nWindowLeft;
     int              m_nWindowTop;
     int              m_nWindowWidth;
     int              m_nWindowHeight;
+    int              m_nCountQuarters;
     int              m_nTimeQuarter;
+    bool             m_bOvertimeEnabled;
+    int              m_nTimeOvertime;
     int              m_nTimeTimeout;
+    int              m_bTimeOffenseUsed;
     int              m_nTimeOffense;
     int              m_nTimeOffenseExt;
 
@@ -192,6 +213,10 @@ private slots:
     void on_pbFaultGuest_clicked();
     void on_pbSettings_clicked();
 
+    void on_pbMinuteNew_clicked();
+
+    void on_pbAttempt_clicked();
+
 private:
 
     Ui::MainWindow          *ui;
@@ -213,16 +238,18 @@ private:
     bool                     bTeamHomePlay;
     bool                     bTeamGuestPlay;
     int                      nTimerTeamPlayTime;
-    int                      nTimeTeamPlaySecond;
+    int                      nTimeOffense;
     int                      nCountPlayerFieldHome;
     int                      nCountPlayerFieldGuest;
     bool                     bSubstituteInProgress;
     int                      nScoreHome;
     int                      nScoreGuest;
+    bool                     m_bMinuteInProgress;
 
+    void                    _enableControls();
     void                    _updateMainPlayTime();
-    void                    _updateTeamHomePlayTime();
-    void                    _updateTeamGuestPlayTime();
+    void                    _updateTeamHomeOffenseTime();
+    void                    _updateTeamGuestOffenseTime();
     void                    _updateDeadTime();
     void                    _resetDeadTime();
     void                    _showTrayInfo( QString p_qsMessage );

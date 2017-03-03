@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = BBDigitalMinutes
 TEMPLATE = app
+TRANSLATIONS = BBDigitalMinutes_hu.ts \
 
 RESOURCES   += bbdigitalminutes.qrc
 RC_FILE      = bbdigitalminutes.rc
@@ -17,12 +18,15 @@ RC_FILE      = bbdigitalminutes.rc
 SOURCES += main.cpp\
         mainwindow.cpp \
     dlgplayeredit.cpp \
-    dlgedit.cpp
+    dlgedit.cpp \
+    dlgsettings.cpp
 
 HEADERS  += mainwindow.h \
     dlgplayeredit.h \
-    dlgedit.h
+    dlgedit.h \
+    dlgsettings.h
 
 FORMS    += mainwindow.ui \
     dlgplayeredit.ui \
-    dlgedit.ui
+    dlgedit.ui \
+    dlgsettings.ui
