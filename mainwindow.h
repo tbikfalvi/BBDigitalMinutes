@@ -212,9 +212,7 @@ private slots:
     void on_pbFaultHome_clicked();
     void on_pbFaultGuest_clicked();
     void on_pbSettings_clicked();
-
     void on_pbMinuteNew_clicked();
-
     void on_pbAttempt_clicked();
 
 private:
@@ -245,6 +243,7 @@ private:
     int                      nScoreHome;
     int                      nScoreGuest;
     bool                     m_bMinuteInProgress;
+    bool                     m_bSelectPlayersToField;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();

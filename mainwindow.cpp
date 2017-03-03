@@ -433,6 +433,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     m_bMinuteInProgress     = false;
 
+    m_bSelectPlayersToField = false;
+
     pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
 
     _updateMainPlayTime();
@@ -452,6 +454,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         move( poSettings->left(), poSettings->top() );
         resize( poSettings->width(), poSettings->height() );
     }
+
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -490,13 +494,37 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
 //===========================================================================================================
 void MainWindow::slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel )
 {
-    _processPlayerPopupMenu( poPlayerPanel, true );
+    if( m_bSelectPlayersToField && nCountPlayerFieldHome < 5 )
+    {
+        _setPlayerToField( poPlayerPanel, true );
+
+        if( nCountPlayerFieldHome == 5 )
+        {
+            m_bSelectPlayersToField = false;
+        }
+    }
+    else
+    {
+        _processPlayerPopupMenu( poPlayerPanel, true );
+    }
 }
 
 //===========================================================================================================
 void MainWindow::slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel )
 {
-    _processPlayerPopupMenu( poPlayerPanel, false );
+    if( m_bSelectPlayersToField && nCountPlayerFieldGuest < 5 )
+    {
+        _setPlayerToField( poPlayerPanel, false );
+
+        if( nCountPlayerFieldGuest == 5 )
+        {
+            m_bSelectPlayersToField = false;
+        }
+    }
+    else
+    {
+        _processPlayerPopupMenu( poPlayerPanel, false );
+    }
 }
 
 //===========================================================================================================
@@ -524,7 +552,13 @@ void MainWindow::slotPlayerGuestDisqualified()
 //===========================================================================================================
 void MainWindow::_enableControls()
 {
+    ui->pbTeamHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbRequestTimeHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbPlayerChangeHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
 
+    ui->pbTeamGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbRequestTimeGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbPlayerChangeGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
 }
 
 //===========================================================================================================
@@ -784,30 +818,64 @@ void MainWindow::_processTeamPopupMenu(bool bHome)
     qfTitle.setBold( true );
     qaTitle.setFont( qfTitle );
 
+    QAction qaImportPlayer( QIcon( ":/resources/folder.png" ), tr("Import players from file ..."), &qmMenu );
+    QAction qaAddPlayer( QIcon( ":/resources/edit.png" ), tr("Add players manually ..."), &qmMenu );
+    QAction qaSelectPlayers( QIcon( ":/resources/basketball_player_in.png" ), tr("Select players to field ..."), &qmMenu );
+    QAction qaDeselectPlayers( QIcon( ":/resources/basketball_player_out.png" ), tr("Remove all players from field."), &qmMenu );
+
+    if( bHome ) qaSelectPlayers.setEnabled( ((nCountPlayerFieldHome<5)&&(qvPanelPlayersHome.size()>4)?true:false) );
+    else        qaSelectPlayers.setEnabled( ((nCountPlayerFieldGuest<5)&&(qvPanelPlayersGuest.size()>4)?true:false) );
+
+    if( bHome ) qaDeselectPlayers.setEnabled( ((nCountPlayerFieldHome>0)&&(qvPanelPlayersHome.size()>0)?true:false) );
+    else        qaDeselectPlayers.setEnabled( ((nCountPlayerFieldGuest>0)&&(qvPanelPlayersGuest.size()>0)?true:false) );
+
     qmMenu.addAction( &qaTitle );
     qmMenu.addSeparator();
-    qmMenu.addAction( QIcon( ":/resources/folder.png" ), tr("Import players from file ...") );
-    qmMenu.addAction( QIcon( ":/resources/edit.png" ), tr("Add players manually ...") );
+    qmMenu.addAction( &qaImportPlayer );
+    qmMenu.addAction( &qaAddPlayer );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaSelectPlayers );
+    qmMenu.addAction( &qaDeselectPlayers );
 
     QAction *qaRet = qmMenu.exec( QCursor::pos() );
 
-    if( qaRet )
+    if( qaRet == &qaImportPlayer )
     {
-        if( qaRet->text().compare( tr("Import players from file ...") ) == 0 )
+        qslImportedPlayers = QStringList("");
+        qsTeamNameFromFile = "";
+        _importPlayersFromFile();
+        _addPlayers( bHome );
+        if( qsTeamNameFromFile.length() > 0 )
         {
-            qslImportedPlayers = QStringList("");
-            qsTeamNameFromFile = "";
-            _importPlayersFromFile();
-            _addPlayers( bHome );
-            if( qsTeamNameFromFile.length() > 0 )
-            {
-                if( bHome ) ui->lblTeamHome->setText( qsTeamNameFromFile );
-                else        ui->lblTeamGuest->setText( qsTeamNameFromFile );
-            }
+            if( bHome ) ui->lblTeamHome->setText( qsTeamNameFromFile );
+            else        ui->lblTeamGuest->setText( qsTeamNameFromFile );
         }
-        else if( qaRet->text().compare( tr("Add players manually ...") ) == 0 )
+    }
+    else if( qaRet == &qaAddPlayer )
+    {
+        _addPlayerManually( bHome, true );
+    }
+    else if( qaRet == &qaSelectPlayers )
+    {
+        m_bSelectPlayersToField = true;
+    }
+    else if( qaRet == &qaDeselectPlayers )
+    {
+        if( bHome )
         {
-            _addPlayerManually( bHome, true );
+            for( int i=0; i<qvPanelPlayersHome.size(); i++ )
+            {
+                qvPanelPlayersHome.at(i)->setPlayerToSubstitute();
+            }
+            nCountPlayerFieldHome = 0;
+        }
+        else
+        {
+            for( int i=0; i<qvPanelPlayersGuest.size(); i++ )
+            {
+                qvPanelPlayersGuest.at(i)->setPlayerToSubstitute();
+            }
+            nCountPlayerFieldGuest = 0;
         }
     }
 }
@@ -1305,6 +1373,7 @@ void MainWindow::on_pbContinueMainTimer_clicked()
     if( poSettings->istimeoffenseused() ) nTimerTeamPlayTime = startTimer( 1000 );
     _resetDeadTime();
     _showTrayInfo( tr( "Play continued, timer is live!" ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1319,6 +1388,7 @@ void MainWindow::on_pbSignalReferee_clicked()
     }
     if( poSettings->issoundenabled() ) pSoundWhistle->play();
     _showTrayInfo( tr( "Play halted, timer stopped!" ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1337,6 +1407,8 @@ void MainWindow::on_pbEditMainTime_clicked()
     ui->pbEditMainTime->setEnabled( false );
     ui->pbSaveMainTime->setEnabled( true );
     ui->pbCancelSaveMainTime->setEnabled( true );
+
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1361,6 +1433,7 @@ void MainWindow::on_pbSaveMainTime_clicked()
                        ui->ledTimeMainMiliSecond->text().toInt()*10;
 
     _updateMainPlayTime();
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1379,6 +1452,7 @@ void MainWindow::on_pbCancelSaveMainTime_clicked()
     ui->pbCancelSaveMainTime->setEnabled( false );
 
     _updateMainPlayTime();
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1387,6 +1461,7 @@ void MainWindow::on_pbRequestTimeHome_clicked()
     nTimeDeadSecond = 61;
     nTimerTimeDead = startTimer( 1000 );
     _showTrayInfo( tr( "Home team requested timeout!" ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1395,6 +1470,7 @@ void MainWindow::on_pbRequestTimeGuest_clicked()
     nTimeDeadSecond = 61;
     nTimerTimeDead = startTimer( 1000 );
     _showTrayInfo( tr( "Guest team requested timeout!" ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1410,6 +1486,7 @@ void MainWindow::on_pbHomePlay_clicked()
         if( nTimerMainPlayTime > 0 && nTimerTeamPlayTime == 0 ) nTimerTeamPlayTime = startTimer( 1000 );
         _updateTeamHomeOffenseTime();
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1425,6 +1502,7 @@ void MainWindow::on_pbGuestPlay_clicked()
         if( nTimerMainPlayTime > 0 && nTimerTeamPlayTime == 0 ) nTimerTeamPlayTime = startTimer( 1000 );
         _updateTeamGuestOffenseTime();
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1457,6 +1535,7 @@ void MainWindow::on_pnIncreaseQuarter_clicked()
             }
         }
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1472,6 +1551,7 @@ void MainWindow::on_pnDecreaseQuarter_clicked()
             ui->ledCountQuarter->setText( QString::number( ui->ledCountQuarter->text().toInt()-1 ) );
         }
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1514,6 +1594,7 @@ void MainWindow::on_pbPlayerChangeHome_clicked()
             }
         }
     }
+    _enableControls();
 }
 
 void MainWindow::on_pbPlayerChangeGuest_clicked()
@@ -1534,6 +1615,7 @@ void MainWindow::on_pbPlayerChangeGuest_clicked()
             }
         }
     }
+    _enableControls();
 }
 
 void MainWindow::on_pbScore1Home_clicked()  {   _increaseTeamScore( 1, true );      }
@@ -1582,6 +1664,8 @@ void MainWindow::on_pbSettings_clicked()
 void MainWindow::on_pbMinuteNew_clicked()
 {
     m_bMinuteInProgress = true;
+
+    _enableControls();
 }
 
 void MainWindow::on_pbAttempt_clicked()
@@ -1592,4 +1676,5 @@ void MainWindow::on_pbAttempt_clicked()
         if( bTeamHomePlay )         _updateTeamHomeOffenseTime();
         else if( bTeamGuestPlay )   _updateTeamGuestOffenseTime();
     }
+    _enableControls();
 }
