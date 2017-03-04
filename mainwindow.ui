@@ -106,6 +106,9 @@
             <height>90</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Manage HOME team related settings.</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -135,6 +138,9 @@
             <height>90</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Timeout request: click if HOME team requests timeout.</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -163,6 +169,9 @@
             <width>90</width>
             <height>90</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Substitute player from HOME team.</string>
           </property>
           <property name="text">
            <string/>
@@ -795,6 +804,9 @@
             <height>90</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Substitute player from GUEST team.</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -824,6 +836,9 @@
             <height>90</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Timeout request: click if GUEST team requests timeout.</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -852,6 +867,9 @@
             <width>90</width>
             <height>90</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Manage GUEST team related settings.</string>
           </property>
           <property name="text">
            <string/>
@@ -936,6 +954,9 @@
                <width>30</width>
                <height>30</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string>Edit name of the HOME team.</string>
              </property>
              <property name="text">
               <string/>
@@ -1039,6 +1060,9 @@
                  <height>90</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Score action: click if HOME team scores 1 point.</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1067,6 +1091,9 @@
                  <width>90</width>
                  <height>90</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Score action: click if HOME team scores 2 point.</string>
                </property>
                <property name="text">
                 <string/>
@@ -1097,6 +1124,9 @@
                  <height>90</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Score action: click if HOME team scores 3 point.</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1125,6 +1155,9 @@
                  <width>90</width>
                  <height>90</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Fault action: click if player from HOME team commits a fault</string>
                </property>
                <property name="text">
                 <string/>
@@ -1881,6 +1914,9 @@
                  <height>90</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Score action: click if GUEST team scores 1 point.</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1909,6 +1945,9 @@
                  <width>90</width>
                  <height>90</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Score action: click if GUEST team scores 2 point.</string>
                </property>
                <property name="text">
                 <string/>
@@ -1939,6 +1978,9 @@
                  <height>90</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Score action: click if GUEST team scores 3 point.</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1967,6 +2009,9 @@
                  <width>90</width>
                  <height>90</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Fault action: click if player from GUEST team commits a fault</string>
                </property>
                <property name="text">
                 <string/>
@@ -2106,6 +2151,9 @@
                <height>30</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>Edit name of the GUEST team</string>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -2213,6 +2261,9 @@
           <height>90</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Create and start a new minute ...</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2242,6 +2293,9 @@
           <height>90</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Save the actual minute.</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2258,7 +2312,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pb_2">
+       <widget class="QPushButton" name="pbCloseMinute">
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2271,8 +2325,15 @@
           <height>90</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Close the actual minute.</string>
+        </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="bbdigitalminutes.qrc">
+          <normaloff>:/resources/minutes_close.png</normaloff>:/resources/minutes_close.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -2281,6 +2342,22 @@
          </size>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="pb_3">
@@ -2396,6 +2473,9 @@
           <height>90</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Reset and clear all team and game settings.</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2460,6 +2540,56 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>pbTeamHome</tabstop>
+  <tabstop>pbRequestTimeHome</tabstop>
+  <tabstop>pbPlayerChangeHome</tabstop>
+  <tabstop>ledPointsHome</tabstop>
+  <tabstop>pbEditMainTime</tabstop>
+  <tabstop>ledTimeMainMinute</tabstop>
+  <tabstop>ledTimeMainSeparator1</tabstop>
+  <tabstop>ledTimeMainSecond</tabstop>
+  <tabstop>ledTimeMainSeparator2</tabstop>
+  <tabstop>ledTimeMainMiliSecond</tabstop>
+  <tabstop>pbCancelSaveMainTime</tabstop>
+  <tabstop>pbSaveMainTime</tabstop>
+  <tabstop>ledPointsGuest</tabstop>
+  <tabstop>pbPlayerChangeGuest</tabstop>
+  <tabstop>pbRequestTimeGuest</tabstop>
+  <tabstop>pbTeamGuest</tabstop>
+  <tabstop>pbEditTeamHome</tabstop>
+  <tabstop>pbEditTeamGuest</tabstop>
+  <tabstop>ledTimerPlayHome</tabstop>
+  <tabstop>ledCountQuarter</tabstop>
+  <tabstop>ledTimerPlayGuest</tabstop>
+  <tabstop>pnIncreaseQuarter</tabstop>
+  <tabstop>pnDecreaseQuarter</tabstop>
+  <tabstop>pbHomePlay</tabstop>
+  <tabstop>ledTimerTimeSecond</tabstop>
+  <tabstop>pbGuestPlay</tabstop>
+  <tabstop>pbContinueMainTimer</tabstop>
+  <tabstop>pbSignalReferee</tabstop>
+  <tabstop>pbAttempt</tabstop>
+  <tabstop>pbScore1Home</tabstop>
+  <tabstop>pbScore2Home</tabstop>
+  <tabstop>pbScore3Home</tabstop>
+  <tabstop>pbFaultHome</tabstop>
+  <tabstop>pbScore1Guest</tabstop>
+  <tabstop>pbScore2Guest</tabstop>
+  <tabstop>pbScore3Guest</tabstop>
+  <tabstop>pbFaultGuest</tabstop>
+  <tabstop>listMinute</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pbMinuteNew</tabstop>
+  <tabstop>pbMinuteSave</tabstop>
+  <tabstop>pbCloseMinute</tabstop>
+  <tabstop>pb_3</tabstop>
+  <tabstop>pb_4</tabstop>
+  <tabstop>pb_5</tabstop>
+  <tabstop>pb_6</tabstop>
+  <tabstop>pbReset</tabstop>
+  <tabstop>pbSettings</tabstop>
+ </tabstops>
  <resources>
   <include location="bbdigitalminutes.qrc"/>
  </resources>

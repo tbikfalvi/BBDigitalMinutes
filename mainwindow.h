@@ -244,6 +244,7 @@ private:
     int                      nScoreGuest;
     bool                     m_bMinuteInProgress;
     bool                     m_bSelectPlayersToField;
+    bool                     m_bGameInProgress;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();

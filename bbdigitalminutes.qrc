@@ -30,5 +30,6 @@
         <file>resources/minutes_new.png</file>
         <file>resources/reset.png</file>
         <file>resources/save.png</file>
+        <file>resources/minutes_close.png</file>
     </qresource>
 </RCC>

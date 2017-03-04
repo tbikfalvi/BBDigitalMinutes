@@ -432,22 +432,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nScoreGuest             = 0;
 
     m_bMinuteInProgress     = false;
-
     m_bSelectPlayersToField = false;
+    m_bGameInProgress       = false;
 
     pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
 
     _updateMainPlayTime();
-
-    ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-
-    ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
 
     if( poSettings->isreloadsizepos() )
     {
@@ -532,10 +522,7 @@ void MainWindow::slotPlayerHomeDisqualified()
 {
     on_pbSignalReferee_clicked();
     nCountPlayerFieldHome--;
-    ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-    ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -543,22 +530,47 @@ void MainWindow::slotPlayerGuestDisqualified()
 {
     on_pbSignalReferee_clicked();
     nCountPlayerFieldGuest--;
-    ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-    ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    _enableControls();
 }
 
 //===========================================================================================================
 void MainWindow::_enableControls()
 {
-    ui->pbTeamHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
-    ui->pbRequestTimeHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
-    ui->pbPlayerChangeHome->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbTeamHome->setEnabled( (nTimerMainPlayTime==0?true:false) );
+    ui->pbRequestTimeHome->setEnabled( (nTimerMainPlayTime==0&&m_bGameInProgress?true:false) );
+    ui->pbPlayerChangeHome->setEnabled( (nTimerMainPlayTime==0 &&
+                                         nCountPlayerFieldHome>0 &&
+                                         qvPanelPlayersHome.size()>nCountPlayerFieldHome ? true : false) );
 
-    ui->pbTeamGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
-    ui->pbRequestTimeGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
-    ui->pbPlayerChangeGuest->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pbTeamGuest->setEnabled( (nTimerMainPlayTime==0?true:false) );
+    ui->pbRequestTimeGuest->setEnabled( (nTimerMainPlayTime==0&&m_bGameInProgress?true:false) );
+    ui->pbPlayerChangeGuest->setEnabled( (nTimerMainPlayTime==0 &&
+                                         nCountPlayerFieldGuest>0 &&
+                                         qvPanelPlayersGuest.size()>nCountPlayerFieldGuest ? true : false) );
+
+    ui->pbEditMainTime->setEnabled( (nTimerMainPlayTime>0?false:true) );
+
+    ui->pnIncreaseQuarter->setEnabled( (nTimerMainPlayTime>0?false:true) );
+    ui->pnDecreaseQuarter->setEnabled( (nTimerMainPlayTime>0?false:true) );
+
+    ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+    ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
+
+    ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+    ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
+
+    ui->pbContinueMainTimer->setEnabled( ( nCountPlayerFieldHome==5&&nCountPlayerFieldGuest==5?true:false ) );
+
+    ui->pbAttempt->setEnabled( poSettings->istimeoffenseused() );
+    ui->pbHomePlay->setEnabled( poSettings->istimeoffenseused() );
+    ui->pbGuestPlay->setEnabled( poSettings->istimeoffenseused() );
+
+    ui->frmTimerPlayHome->setVisible( poSettings->istimeoffenseused() );
+    ui->frmTimerPlayGuest->setVisible( poSettings->istimeoffenseused() );
 }
 
 //===========================================================================================================
@@ -878,6 +890,7 @@ void MainWindow::_processTeamPopupMenu(bool bHome)
             nCountPlayerFieldGuest = 0;
         }
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -941,6 +954,7 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
             _deletePlayer( poPlayerPanel, bHome );
         }
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1072,19 +1086,12 @@ void MainWindow::_setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome )
     if( bHome )
     {
         nCountPlayerFieldHome++;
-        ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
     }
     else
     {
         nCountPlayerFieldGuest++;
-        ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1095,19 +1102,12 @@ void MainWindow::_setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome
     if( bHome )
     {
         nCountPlayerFieldHome--;
-        ui->pbScore1Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbScore2Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbScore3Home->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
-        ui->pbFaultHome->setEnabled( ( nCountPlayerFieldHome>0?true:false ) );
     }
     else
     {
         nCountPlayerFieldGuest--;
-        ui->pbScore1Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbScore2Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbScore3Guest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
-        ui->pbFaultGuest->setEnabled( ( nCountPlayerFieldGuest>0?true:false ) );
     }
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -1363,6 +1363,7 @@ void MainWindow::_setPlayerFault(bool bHome)
 //===========================================================================================================
 void MainWindow::on_pbContinueMainTimer_clicked()
 {
+    m_bGameInProgress = true;
     if( nCountPlayerFieldHome < 5 || nCountPlayerFieldGuest < 5 )
     {
         QMessageBox::warning( this, tr("Warning"),
