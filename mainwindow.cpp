@@ -30,8 +30,10 @@
 cSettings::cSettings()
 {
     QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-    QSettings   qsetHomeTeam(    QString( "%1/TeamHome.info" ).arg(         QDir::currentPath() ), QSettings::IniFormat );
-    QSettings   qsetGuestTeam(   QString( "%1/TeamGuest.info" ).arg(        QDir::currentPath() ), QSettings::IniFormat );
+
+    pQSetTeamHome   = new QSettings( QString( "%1/TeamHome.info"  ).arg( QDir::currentPath() ), QSettings::IniFormat );
+    pQSetTeamGuest  = new QSettings( QString( "%1/TeamGuest.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
+    pQSetGameStatus = new QSettings( QString( "%1/Game.info"      ).arg( QDir::currentPath() ), QSettings::IniFormat );
 
     // Application settings related
     m_qsLang                = qsetApplication.value( "Lang",                    "en"    ).toString();
@@ -51,24 +53,12 @@ cSettings::cSettings()
     m_bTimeOffenseUsed      = qsetApplication.value( "Game/OffenseTimeUsed",    false   ).toBool();
     m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
     m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
-
-    if( m_bIsMinuteClosed )
-    {
-        // Reset all info files
-    }
-    else
-    {
-        // Some error occured, reload last known status
-        m_qsNameTeamHome    = qsetHomeTeam.value( "Team/Name", QObject::tr("Team HOME") ).toString();
-    }
 }
 
 //===========================================================================================================
 cSettings::~cSettings()
 {
     saveAppSettings();
-    saveHomeSettings();
-    saveGuestSettings();
 }
 
 //===========================================================================================================
@@ -97,20 +87,94 @@ void cSettings::saveAppSettings()
 }
 
 //===========================================================================================================
-void cSettings::saveHomeSettings()
+QString cSettings::teamName(bool bHome)
 {
-    // Home team related
-    QSettings   qsetHomeTeam( QString( "%1/TeamHome.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-
+    if( bHome ) return pQSetTeamHome->value( "TeamName",  QObject::tr("HOME team") ).toString();
+    else        return pQSetTeamGuest->value( "TeamName", QObject::tr("GUEST team") ).toString();
 }
 
 //===========================================================================================================
-void cSettings::saveGuestSettings()
+void cSettings::setTeamName(bool bHome, QString name)
 {
-    // Guest team related
-    QSettings   qsetGuestTeam( QString( "%1/TeamGuest.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-
+    if( bHome ) pQSetTeamHome->setValue( "TeamName", name );
+    else        pQSetTeamGuest->setValue( "TeamName", name );
 }
+
+//===========================================================================================================
+QStringList cSettings::players( bool bHome )
+{
+    QString qsPlayers;
+
+    if( bHome ) qsPlayers = pQSetTeamHome->value( "Players", "" ).toString();
+    else        qsPlayers = pQSetTeamGuest->value( "Players", "" ).toString();
+
+    return qsPlayers.split( "|" );
+}
+
+//===========================================================================================================
+void cSettings::setPlayers(bool bHome, QStringList players)
+{
+    if( bHome ) pQSetTeamHome->setValue( "Players", players.join( "|" ) );
+    else        pQSetTeamGuest->setValue( "Players", players.join( "|" ) );
+}
+
+//===========================================================================================================
+QStringList cSettings::playersField( bool bHome )
+{
+    QString qsPlayers;
+
+    if( bHome ) qsPlayers = pQSetTeamHome->value( "PlayersOnField", "" ).toString();
+    else        qsPlayers = pQSetTeamGuest->value( "PlayersOnField", "" ).toString();
+
+    return qsPlayers.split( "|" );
+}
+
+//===========================================================================================================
+void cSettings::setPlayersField(bool bHome, QStringList players)
+{
+    if( bHome ) pQSetTeamHome->setValue( "PlayersOnField", players.join( "|" ) );
+    else        pQSetTeamGuest->setValue( "PlayersOnField", players.join( "|" ) );
+}
+
+//===========================================================================================================
+int cSettings::score( bool bHome )
+{
+    if( bHome ) return pQSetGameStatus->value( "ScoreHome", "0" ).toInt();
+    else        return pQSetGameStatus->value( "ScoreGuest", "0" ).toInt();
+}
+
+//===========================================================================================================
+void cSettings::setScore( bool bHome, int score )
+{
+    if( bHome ) pQSetGameStatus->setValue( "ScoreHome", score );
+    else        pQSetGameStatus->setValue( "ScoreGuest", score );
+}
+
+//===========================================================================================================
+int cSettings::quarter()
+{
+    return pQSetGameStatus->value( "Quarter", "1" ).toInt();
+}
+
+//===========================================================================================================
+void cSettings::setQuarter(int quarter)
+{
+    return pQSetGameStatus->setValue( "Quarter", quarter );
+}
+
+//===========================================================================================================
+QString cSettings::minuteFileName()
+{
+    return pQSetGameStatus->value( "MinuteFileName", "" ).toString();
+}
+
+//===========================================================================================================
+void cSettings::setMinuteFileName(QString filename)
+{
+    return pQSetGameStatus->setValue( "MinuteFileName", filename );
+}
+
+//===========================================================================================================
 
 //===========================================================================================================
 void cSettings::createMinute(QString p_qsMinuteName)
@@ -492,6 +556,7 @@ void MainWindow::slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel )
         {
             m_bSelectPlayersToField = false;
         }
+        _savePlayers( true );
     }
     else
     {
@@ -510,6 +575,7 @@ void MainWindow::slotPlayerPanelGuestClicked( cPanelPlayer *poPlayerPanel )
         {
             m_bSelectPlayersToField = false;
         }
+        _savePlayers( false );
     }
     else
     {
@@ -775,6 +841,7 @@ void MainWindow::_addPlayersToHome()
             }
         }
     }
+    _savePlayers( true );
 }
 
 //====================================================================================
@@ -815,6 +882,7 @@ void MainWindow::_addPlayersToGuest()
             }
         }
     }
+    _savePlayers( false );
 }
 
 //===========================================================================================================
@@ -861,6 +929,8 @@ void MainWindow::_processTeamPopupMenu(bool bHome)
         {
             if( bHome ) ui->lblTeamHome->setText( qsTeamNameFromFile );
             else        ui->lblTeamGuest->setText( qsTeamNameFromFile );
+
+            poSettings->setTeamName( bHome, qsTeamNameFromFile );
         }
     }
     else if( qaRet == &qaAddPlayer )
@@ -891,6 +961,7 @@ void MainWindow::_processTeamPopupMenu(bool bHome)
         }
     }
     _enableControls();
+    _savePlayers( bHome );
 }
 
 //===========================================================================================================
@@ -955,6 +1026,7 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
         }
     }
     _enableControls();
+    _savePlayers( bHome );
 }
 
 //===========================================================================================================
@@ -1000,6 +1072,7 @@ void MainWindow::_reorderPlayersHome()
             break;
         }
     }
+    _savePlayers( true );
 }
 
 //===========================================================================================================
@@ -1045,6 +1118,7 @@ void MainWindow::_reorderPlayersGuest()
             break;
         }
     }
+    _savePlayers( false );
 }
 
 //===========================================================================================================
@@ -1076,6 +1150,7 @@ void MainWindow::_deletePlayer(cPanelPlayer *poPlayerPanel, bool bHome)
             break;
         }
     }
+    _savePlayers( bHome );
 }
 
 //===========================================================================================================
@@ -1281,6 +1356,77 @@ void MainWindow::_increaseTeamScore(int nScoreValue, bool bHome)
 }
 
 //===========================================================================================================
+void MainWindow::_increaseTeamScoreFault(bool bHome)
+{
+    QList<cPanelPlayer*>    *qlPlayers;
+    QMenu                    qmMenu;
+
+    if( bHome ) qlPlayers = &qvPanelPlayersHome;
+    else        qlPlayers = &qvPanelPlayersGuest;
+
+    QAction qaTitle( tr("Select player ..."), &qmMenu );
+    QFont   qfTitle;
+    qfTitle.setBold( true );
+    qaTitle.setFont( qfTitle );
+
+    qmMenu.addAction( &qaTitle );
+    qmMenu.addSeparator();
+
+    for( int i=0; i<qlPlayers->size(); i++ )
+    {
+        QAction *qaPlayer = new QAction( qlPlayers->at(i)->playerWithNumber(" - "), &qmMenu );
+        if( qlPlayers->at(i)->isPlayerOnField() )
+        {
+            QFont   qfPlayer;
+            qfPlayer.setBold( true );
+            qaPlayer->setFont( qfPlayer );
+        }
+        qmMenu.addAction( qaPlayer );
+    }
+
+    posMenu.setX( QCursor::pos().x() );
+    posMenu.setY( QCursor::pos().y() );
+
+    cPanelPlayer *pPlayer = NULL;
+    do
+    {
+        QAction *qaRet = qmMenu.exec( posMenu );
+
+        if( qaRet && qaRet->text().contains( " - ") )
+        {
+            for( int i=0; i<qlPlayers->size(); i++ )
+            {
+                if( qlPlayers->at(i)->playerNumber() == qaRet->text().split( " - " ).at(0).toInt() )
+                {
+                    pPlayer = qlPlayers->at(i);
+                    break;
+                }
+            }
+        }
+
+        if( pPlayer == NULL )
+        {
+            QMessageBox::warning( this, tr("Warning"),
+                                  tr("Player must be selected to document the score!") );
+        }
+        else
+        {
+            if( QMessageBox::question( this, "Question",
+                                       tr("Is the penalty succeeded?"),
+                                       QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+            {
+                _updateScore( pPlayer, 1, bHome );
+            }
+            else
+            {
+                _updateScore( pPlayer, 0, bHome );
+            }
+        }
+
+    } while( pPlayer == NULL );
+}
+
+//===========================================================================================================
 void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome)
 {
     if( bHome )
@@ -1288,12 +1434,14 @@ void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool
         nScoreHome += nScoreValue;
         ui->ledPointsHome->setText( QString::number( nScoreHome ) );
         on_pbGuestPlay_clicked();
+        poSettings->setScore( bHome, nScoreHome );
     }
     else
     {
         nScoreGuest += nScoreValue;
         ui->ledPointsGuest->setText( QString::number( nScoreGuest ) );
         on_pbHomePlay_clicked();
+        poSettings->setScore( bHome, nScoreGuest );
     }
     poPlayerPanel->increaseScore( nScoreValue );
 }
@@ -1354,6 +1502,38 @@ void MainWindow::_setPlayerFault(bool bHome)
         }
 
     } while( pPlayer == NULL );
+
+    _savePlayers( bHome );
+}
+
+//===========================================================================================================
+void MainWindow::_savePlayers(bool bHome)
+{
+    QList<cPanelPlayer*>    *pQLPlayers = NULL;
+
+    if( bHome )
+    {
+        pQLPlayers = &qvPanelPlayersHome;
+    }
+    else
+    {
+        pQLPlayers = &qvPanelPlayersGuest;
+    }
+
+    QStringList qslPlayers;
+    QStringList qslPlayersField;
+
+    for( int i=0; i<pQLPlayers->size(); i++ )
+    {
+        QString qsPlayer = QString( "%1\t%2" )
+                                    .arg( pQLPlayers->at(i)->playerWithNumber() )
+                                    .arg( pQLPlayers->at(i)->playerFaults() );
+        qslPlayers << qsPlayer;
+        if( pQLPlayers->at(i)->isPlayerOnField() )
+            qslPlayersField << qsPlayer;
+    }
+    poSettings->setPlayers( bHome, qslPlayers );
+    poSettings->setPlayersField( bHome, qslPlayersField );
 }
 
 //===========================================================================================================
@@ -1537,6 +1717,7 @@ void MainWindow::on_pnIncreaseQuarter_clicked()
         }
     }
     _enableControls();
+    poSettings->setQuarter( ui->ledCountQuarter->text().toInt() );
 }
 
 //===========================================================================================================
@@ -1553,6 +1734,7 @@ void MainWindow::on_pnDecreaseQuarter_clicked()
         }
     }
     _enableControls();
+    poSettings->setQuarter( ui->ledCountQuarter->text().toInt() );
 }
 
 //===========================================================================================================
@@ -1570,11 +1752,13 @@ void MainWindow::on_pbTeamGuest_clicked()
 void MainWindow::on_pbEditTeamHome_clicked()
 {
     _processTeamNamePopupMenu( ui->lblTeamHome );
+    poSettings->setTeamName( true, ui->lblTeamHome->text() );
 }
 
 void MainWindow::on_pbEditTeamGuest_clicked()
 {
     _processTeamNamePopupMenu( ui->lblTeamGuest );
+    poSettings->setTeamName( true, ui->lblTeamGuest->text() );
 }
 
 void MainWindow::on_pbPlayerChangeHome_clicked()
@@ -1596,6 +1780,7 @@ void MainWindow::on_pbPlayerChangeHome_clicked()
         }
     }
     _enableControls();
+    _savePlayers( true );
 }
 
 void MainWindow::on_pbPlayerChangeGuest_clicked()
@@ -1617,12 +1802,13 @@ void MainWindow::on_pbPlayerChangeGuest_clicked()
         }
     }
     _enableControls();
+    _savePlayers( false );
 }
 
-void MainWindow::on_pbScore1Home_clicked()  {   _increaseTeamScore( 1, true );      }
+void MainWindow::on_pbScore1Home_clicked()  {   _increaseTeamScoreFault( true );    }
 void MainWindow::on_pbScore2Home_clicked()  {   _increaseTeamScore( 2, true );      }
 void MainWindow::on_pbScore3Home_clicked()  {   _increaseTeamScore( 3, true );      }
-void MainWindow::on_pbScore1Guest_clicked() {   _increaseTeamScore( 1, false  );    }
+void MainWindow::on_pbScore1Guest_clicked() {   _increaseTeamScoreFault( false  );  }
 void MainWindow::on_pbScore2Guest_clicked() {   _increaseTeamScore( 2, false );     }
 void MainWindow::on_pbScore3Guest_clicked() {   _increaseTeamScore( 3, false );     }
 

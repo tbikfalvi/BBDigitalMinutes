@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QMouseEvent>
 #include <QSound>
+#include <QSettings>
 
 class cSettings
 {
@@ -61,16 +62,24 @@ public:
     void             saveMinute();
     void             closeMinute();
 
-    void             saveHomeSettings();
+    // Team related
+    QSettings       *pQSetTeamHome;
+    QSettings       *pQSetTeamGuest;
+    QSettings       *pQSetGameStatus;
 
-    // Home team related
-    QString          nameTeamHome()                                 { return m_qsNameTeamHome;      }
+    QString          teamName( bool bHome = true );
+    QStringList      players( bool bHome = true );
+    QStringList      playersField( bool bHome = true );
+    int              score( bool bHome = true );
+    int              quarter();
+    QString          minuteFileName();
 
-    void             setNameTeamHome( QString name )                { m_qsNameTeamHome  = name;     }
-
-    // Guest team related
-
-    void             saveGuestSettings();
+    void             setTeamName( bool bHome = true, QString name = "" );                           //
+    void             setPlayers( bool bHome = true, QStringList players = QStringList("") );        //
+    void             setPlayersField( bool bHome = true, QStringList players = QStringList("") );   //
+    void             setScore(bool bHome = true , int score = 0 );                                  //
+    void             setQuarter( int quarter = 1 );                                                 //
+    void             setMinuteFileName( QString filename );
 
 private:
 
@@ -98,6 +107,8 @@ private:
 
     // Home team related
     QString          m_qsNameTeamHome;
+    int              m_nCountPlayersHome;
+    QStringList      m_qslPlayersHome;
 
     // Guest team related
     QString          m_qsNameTeamGuest;
@@ -137,6 +148,7 @@ public:
     void             increaseScore( int p_nScore );
     void             setPlayerFault();
 
+    int              playerFaults()                 {   return nCountFaults;                }
     bool             isPlayerOnField()              {   return bPlayerOnField;              }
     bool             isEnabledToPlay()              {   return (nCountFaults<5?true:false); }
 
@@ -272,8 +284,10 @@ private:
     void                    _selectPlayerFromField( bool bHome = true );
     void                    _selectPlayerFromSubstitute( bool bHome = true );
     void                    _increaseTeamScore( int nScoreValue, bool bHome = true );
+    void                    _increaseTeamScoreFault( bool bHome = true );
     void                    _updateScore( cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome = true );
     void                    _setPlayerFault( bool bHome = true );
+    void                    _savePlayers( bool bHome = true );
 };
 
 #endif // MAINWINDOW_H
