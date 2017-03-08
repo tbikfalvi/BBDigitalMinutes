@@ -154,6 +154,12 @@ QString cPanelPlayer::playerWithNumber( QString p_qsSeparator )
     return QString( "%1%2%3" ).arg( nPlayerNumber ).arg( p_qsSeparator ).arg( qsPlayerName );
 }
 
+//===========================================================================================================
+QString cPanelPlayer::playerAndNumber()
+{
+    return QString( "%1 (%2)" ).arg( qsPlayerName ).arg( nPlayerNumber );
+}
+
 //====================================================================================
 void cPanelPlayer::mousePressEvent ( QMouseEvent *p_poEvent )
 {

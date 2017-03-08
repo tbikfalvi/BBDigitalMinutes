@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     nTimerMainPlayTime      = 0;
     nTimeMainMiliSec        = poSettings->timeQuarter() * 60000;
+    nTimeMinuteMiliSec      = 0;
 
     nTimerTimeDead          = 0;
     nTimeDeadSecond         = poSettings->timeout() + 1;
@@ -75,6 +76,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
 
     _enableControls();
+
+    ui->frmEventsHome->setEnabled( false );
+    ui->frmEventsHome->setVisible( false );
+    ui->frmEventsGuest->setEnabled( false );
+    ui->frmEventsGuest->setVisible( false );
 }
 
 //===========================================================================================================
@@ -94,7 +100,8 @@ void MainWindow::timerEvent(QTimerEvent *p_poEvent)
 {
     if( p_poEvent->timerId() == nTimerMainPlayTime )
     {
-        nTimeMainMiliSec -= 10;
+        nTimeMainMiliSec   -= 10;
+        nTimeMinuteMiliSec += 10;
         _updateMainPlayTime();
     }
     else if( p_poEvent->timerId() == nTimerTimeDead )
@@ -207,6 +214,15 @@ void MainWindow::_enableControls()
 //===========================================================================================================
 void MainWindow::_updateMainPlayTime()
 {
+    if( nTimeMainMiliSec < 1 )
+    {
+        _showTrayWarning( tr( "The normal play time of the quarter has expired!" ) );
+        killTimer( nTimerMainPlayTime );
+        killTimer( nTimerTeamPlayTime );
+        nTimerMainPlayTime = 0;
+        nTimerTeamPlayTime = 0;
+        _enableControls();
+    }
     ui->ledTimeMainMinute->setText( QString( "%1" ).arg( nTimeMainMiliSec/60000, 2, 10, QChar( '0' ) ) );
     ui->ledTimeMainSecond->setText( QString( "%1" ).arg( (nTimeMainMiliSec%60000)/1000, 2, 10, QChar( '0' ) ) );
     ui->ledTimeMainMiliSecond->setText( QString( "%1" ).arg( ((nTimeMainMiliSec%60000)%1000)/10, 2, 10, QChar( '0' ) ) );
@@ -461,12 +477,21 @@ void MainWindow::_processTeamPopupMenu(bool bHome)
     QAction qaTitle( qsTitle, &qmMenu );
     QFont   qfTitle;
     qfTitle.setBold( true );
+    qfTitle.setPointSize( 11 );
     qaTitle.setFont( qfTitle );
+
+    QFont   qfItems;
+    qfItems.setPointSize( 10 );
 
     QAction qaImportPlayer( QIcon( ":/resources/folder.png" ), tr("Import players from file ..."), &qmMenu );
     QAction qaAddPlayer( QIcon( ":/resources/edit.png" ), tr("Add players manually ..."), &qmMenu );
     QAction qaSelectPlayers( QIcon( ":/resources/basketball_player_in.png" ), tr("Select players to field ..."), &qmMenu );
     QAction qaDeselectPlayers( QIcon( ":/resources/basketball_player_out.png" ), tr("Remove all players from field."), &qmMenu );
+
+    qaImportPlayer.setFont( qfItems );
+    qaAddPlayer.setFont( qfItems );
+    qaSelectPlayers.setFont( qfItems );
+    qaDeselectPlayers.setFont( qfItems );
 
     if( bHome ) qaSelectPlayers.setEnabled( ((nCountPlayerFieldHome<5)&&(qvPanelPlayersHome.size()>4)?true:false) );
     else        qaSelectPlayers.setEnabled( ((nCountPlayerFieldGuest<5)&&(qvPanelPlayersGuest.size()>4)?true:false) );
@@ -537,30 +562,98 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
     QAction qaTitle( poPlayerPanel->playerWithNumber(" "), &qmMenu );
     QFont   qfTitle;
     qfTitle.setBold( true );
+    qfTitle.setPointSize( 11 );
     qaTitle.setFont( qfTitle );
+
+    QFont   qfItems;
+    qfItems.setPointSize( 10 );
+
+    QAction qaPlayerScore1( QIcon( ":/resources/basketball_score_1.png" ),tr("Score 1 attempt ..."), &qmMenu );
+    qaPlayerScore1.setFont( qfItems );
+
+    QAction qaPlayerScore2( QIcon( ":/resources/basketball_score_2.png" ),tr("Score 2 attempt ..."), &qmMenu );
+    qaPlayerScore2.setEnabled( poPlayerPanel->isPlayerOnField() );
+    qaPlayerScore2.setFont( qfItems );
+
+    QAction qaPlayerScore3( QIcon( ":/resources/basketball_score_3.png" ),tr("Score 3 attempt ..."), &qmMenu );
+    qaPlayerScore3.setEnabled( poPlayerPanel->isPlayerOnField() );
+    qaPlayerScore3.setFont( qfItems );
 
     QAction qaPlayerToField( QIcon( ":/resources/basketball_player_in.png" ),tr("Move player to field ..."), &qmMenu );
     qaPlayerToField.setEnabled( _isPlayerAllowedToField( poPlayerPanel, bHome ) );
+    qaPlayerToField.setFont( qfItems );
 
     QAction qaPlayerToSubstitute( QIcon( ":/resources/basketball_player_out.png" ),tr("Move player to substitute ..."), &qmMenu );
     qaPlayerToSubstitute.setEnabled( poPlayerPanel->isPlayerOnField() );
+    qaPlayerToSubstitute.setFont( qfItems );
 
     QAction qaPlayerEdit( QIcon( ":/resources/edit.png" ), tr("Edit player data ..."), &qmMenu );
+    qaPlayerEdit.setFont( qfItems );
 
     QAction qaPlayerDelete( QIcon( ":/resources/delete.png" ), tr("Delete player from team"), &qmMenu );
+    qaPlayerDelete.setFont( qfItems );
 
     qmMenu.addAction( &qaTitle );
     qmMenu.addSeparator();
-    qmMenu.addAction( &qaPlayerEdit );
+    qmMenu.addAction( &qaPlayerScore1 );
+    qmMenu.addAction( &qaPlayerScore2 );
+    qmMenu.addAction( &qaPlayerScore3 );
     qmMenu.addSeparator();
     qmMenu.addAction( &qaPlayerToField );
     qmMenu.addAction( &qaPlayerToSubstitute );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaPlayerEdit );
     qmMenu.addSeparator();
     qmMenu.addAction( &qaPlayerDelete );
 
     QAction *qaRet = qmMenu.exec( QCursor::pos() );
 
-    if( qaRet == &qaPlayerEdit )
+    if( qaRet == &qaPlayerScore1 )
+    {
+        if( QMessageBox::question( this, "Question",
+                                   tr("Is the penalty throw succeeded?"),
+                                   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+        {
+            _updateScore( poPlayerPanel, 1, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_1, poPlayerPanel->playerAndNumber(), bHome );
+        }
+        else
+        {
+            _updateScore( poPlayerPanel, 0, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_1_FAILED, poPlayerPanel->playerAndNumber(), bHome );
+        }
+    }
+    else if( qaRet == &qaPlayerScore2 )
+    {
+        if( QMessageBox::question( this, "Question",
+                                   tr("Is the throw succeeded?"),
+                                   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+        {
+            _updateScore( poPlayerPanel, 2, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_2, poPlayerPanel->playerAndNumber(), bHome );
+        }
+        else
+        {
+            _updateScore( poPlayerPanel, 0, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_2_FAILED, poPlayerPanel->playerAndNumber(), bHome );
+        }
+    }
+    else if( qaRet == &qaPlayerScore3 )
+    {
+        if( QMessageBox::question( this, "Question",
+                                   tr("Is the throw succeeded?"),
+                                   QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+        {
+            _updateScore( poPlayerPanel, 3, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_3, poPlayerPanel->playerAndNumber(), bHome );
+        }
+        else
+        {
+            _updateScore( poPlayerPanel, 0, bHome );
+            _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_3_FAILED, poPlayerPanel->playerAndNumber(), bHome );
+        }
+    }
+    else if( qaRet == &qaPlayerEdit )
     {
         dlgPlayerEdit   obDlgPlayerEdit( this, poPlayerPanel->playerNumber(), poPlayerPanel->playerName() );
 
@@ -861,7 +954,7 @@ void MainWindow::_selectPlayerFromSubstitute( bool bHome )
         }
     }
 }
-
+/*
 //===========================================================================================================
 void MainWindow::_increaseTeamScore(int nScoreValue, bool bHome)
 {
@@ -977,20 +1070,22 @@ void MainWindow::_increaseTeamScoreFault(bool bHome)
         else
         {
             if( QMessageBox::question( this, "Question",
-                                       tr("Is the penalty succeeded?"),
+                                       tr("Is the penalty throw succeeded?"),
                                        QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
             {
                 _updateScore( pPlayer, 1, bHome );
+                _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_1, pPlayer->playerAndNumber(), bHome );
             }
             else
             {
                 _updateScore( pPlayer, 0, bHome );
+                _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_1_FAILED, pPlayer->playerAndNumber(), bHome );
             }
         }
 
     } while( pPlayer == NULL );
 }
-
+*/
 //===========================================================================================================
 void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome)
 {
@@ -1064,6 +1159,7 @@ void MainWindow::_setPlayerFault(bool bHome)
         else
         {
             pPlayer->setPlayerFault();
+            _addMinuteAction( cMinActionType::MAT_PLAYER_FAULT_GAME, pPlayer->playerAndNumber(), bHome );
         }
 
     } while( pPlayer == NULL );
@@ -1099,6 +1195,27 @@ void MainWindow::_savePlayers(bool bHome)
     }
     poSettings->setPlayers( bHome, qslPlayers );
     poSettings->setPlayersField( bHome, qslPlayersField );
+}
+
+//===========================================================================================================
+void MainWindow::_addMinuteAction(cMinActionType::teAction p_teAction, QString p_qsParameter, bool bHome)
+{
+    if( poMinute )
+    {
+        QString qsTimeStamp     = QString( "%1:%2:%3" ).arg( nTimeMinuteMiliSec/60000, 2, 10, QChar( '0' ) )
+                                                   .arg( (nTimeMinuteMiliSec%60000)/1000, 2, 10, QChar( '0' ) )
+                                                   .arg( ((nTimeMinuteMiliSec%60000)%1000)/10, 2, 10, QChar( '0' ) );
+        QString qsAction        = QString( cMinActionType::toStr( p_teAction ) ).arg( p_qsParameter );
+        QString qsCodeTeam      = ( bHome ? "H" : "G" );
+        QString qsCodeAction    = QString( cMinActionType::toCode( p_teAction ) );
+        QString qsMinuteEntry   = QString( "%1 - %2%3 %4" ).arg( qsTimeStamp )
+                                                           .arg( qsCodeTeam )
+                                                           .arg( qsCodeAction )
+                                                           .arg( qsAction );
+
+        ui->listMinute->addItem( qsMinuteEntry );
+        ui->listMinute->scrollToBottom();
+    }
 }
 
 //===========================================================================================================
@@ -1208,6 +1325,7 @@ void MainWindow::on_pbRequestTimeHome_clicked()
     nTimerTimeDead = startTimer( 1000 );
     _showTrayInfo( tr( "Home team requested timeout!" ) );
     _enableControls();
+    _addMinuteAction( cMinActionType::MAT_TEAM_TIMEOUT, ui->lblTeamHome->text(), true );
 }
 
 //===========================================================================================================
@@ -1217,6 +1335,7 @@ void MainWindow::on_pbRequestTimeGuest_clicked()
     nTimerTimeDead = startTimer( 1000 );
     _showTrayInfo( tr( "Guest team requested timeout!" ) );
     _enableControls();
+    _addMinuteAction( cMinActionType::MAT_TEAM_TIMEOUT, ui->lblTeamGuest->text(), false );
 }
 
 //===========================================================================================================
@@ -1341,6 +1460,10 @@ void MainWindow::on_pbPlayerChangeHome_clicked()
             {
                 pPlayerToSubstitute->setPlayerToSubstitute();
                 pPlayerToField->setPlayerToField();
+                QString qsTemp = QString( "%1 <-> %2" )
+                                        .arg( pPlayerToSubstitute->playerAndNumber() )
+                                        .arg( pPlayerToField->playerAndNumber() );
+                _addMinuteAction( cMinActionType::MAT_PLAYER_SUBSTITUTE, qsTemp, true );
             }
         }
     }
@@ -1363,20 +1486,24 @@ void MainWindow::on_pbPlayerChangeGuest_clicked()
             {
                 pPlayerToSubstitute->setPlayerToSubstitute();
                 pPlayerToField->setPlayerToField();
+                QString qsTemp = QString( "%1 (%2) <-> %3 (%4)" )
+                                        .arg( pPlayerToSubstitute->playerAndNumber() )
+                                        .arg( pPlayerToField->playerAndNumber() );
+                _addMinuteAction( cMinActionType::MAT_PLAYER_SUBSTITUTE, qsTemp, false );
             }
         }
     }
     _enableControls();
     _savePlayers( false );
 }
-
+/*
 void MainWindow::on_pbScore1Home_clicked()  {   _increaseTeamScoreFault( true );    }
 void MainWindow::on_pbScore2Home_clicked()  {   _increaseTeamScore( 2, true );      }
 void MainWindow::on_pbScore3Home_clicked()  {   _increaseTeamScore( 3, true );      }
 void MainWindow::on_pbScore1Guest_clicked() {   _increaseTeamScoreFault( false  );  }
 void MainWindow::on_pbScore2Guest_clicked() {   _increaseTeamScore( 2, false );     }
 void MainWindow::on_pbScore3Guest_clicked() {   _increaseTeamScore( 3, false );     }
-
+*/
 void MainWindow::on_pbFaultHome_clicked()
 {
     _setPlayerFault( true );

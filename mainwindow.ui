@@ -188,6 +188,38 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="pbFaultHome">
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>90</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>90</width>
+            <height>90</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Fault action: click if player from HOME team commits a fault</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="bbdigitalminutes.qrc">
+            <normaloff>:/resources/basketball_player_fault.png</normaloff>:/resources/basketball_player_fault.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>80</width>
+            <height>80</height>
+           </size>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -791,6 +823,38 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
+         <widget class="QPushButton" name="pbFaultGuest">
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>90</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>90</width>
+            <height>90</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Fault action: click if player from GUEST team commits a fault</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="bbdigitalminutes.qrc">
+            <normaloff>:/resources/basketball_player_fault.png</normaloff>:/resources/basketball_player_fault.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>80</width>
+            <height>80</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pbPlayerChangeGuest">
           <property name="minimumSize">
            <size>
@@ -1133,38 +1197,6 @@
                <property name="icon">
                 <iconset resource="bbdigitalminutes.qrc">
                  <normaloff>:/resources/basketball_score_3.png</normaloff>:/resources/basketball_score_3.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>80</width>
-                 <height>80</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pbFaultHome">
-               <property name="minimumSize">
-                <size>
-                 <width>90</width>
-                 <height>90</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>90</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Fault action: click if player from HOME team commits a fault</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="bbdigitalminutes.qrc">
-                 <normaloff>:/resources/basketball_player_fault.png</normaloff>:/resources/basketball_player_fault.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -1997,38 +2029,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pbFaultGuest">
-               <property name="minimumSize">
-                <size>
-                 <width>90</width>
-                 <height>90</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>90</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>Fault action: click if player from GUEST team commits a fault</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="bbdigitalminutes.qrc">
-                 <normaloff>:/resources/basketball_player_fault.png</normaloff>:/resources/basketball_player_fault.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>80</width>
-                 <height>80</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="verticalSpacer_10">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -2573,11 +2573,9 @@
   <tabstop>pbScore1Home</tabstop>
   <tabstop>pbScore2Home</tabstop>
   <tabstop>pbScore3Home</tabstop>
-  <tabstop>pbFaultHome</tabstop>
   <tabstop>pbScore1Guest</tabstop>
   <tabstop>pbScore2Guest</tabstop>
   <tabstop>pbScore3Guest</tabstop>
-  <tabstop>pbFaultGuest</tabstop>
   <tabstop>listMinute</tabstop>
   <tabstop>pushButton</tabstop>
   <tabstop>pbMinuteNew</tabstop>

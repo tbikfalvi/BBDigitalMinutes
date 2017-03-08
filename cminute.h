@@ -19,6 +19,9 @@ public:
         MAT_PLAYER_SCORE_1,
         MAT_PLAYER_SCORE_2,
         MAT_PLAYER_SCORE_3,
+        MAT_PLAYER_SCORE_1_FAILED,
+        MAT_PLAYER_SCORE_2_FAILED,
+        MAT_PLAYER_SCORE_3_FAILED,
         MAT_PLAYER_FAULT_GAME,
         MAT_PLAYER_FAULT_TECHNICAL,
         MAT_PLAYER_FAULT_SUBSTITUTE,
@@ -29,25 +32,52 @@ public:
         MAT_CUSTOM
     };
 
-    QString toStr( teAction p_teAction )
+    static const char *toStr( teAction p_teAction )
     {
         switch( p_teAction )
         {
-            case MAT_DEFAULT:                       return QObject::tr( "%1" ); break;
-            case MAT_PLAYER_SCORE_1:                return QObject::tr( "Player '%1' (%2) scored penalty" ); break;
-            case MAT_PLAYER_SCORE_2:                return QObject::tr( "Player '%1' (%2) scored short distant throw (2 points)" ); break;
-            case MAT_PLAYER_SCORE_3:                return QObject::tr( "Player '%1' (%2) scored long distant throw (3 points)" ); break;
-            case MAT_PLAYER_FAULT_GAME:             return QObject::tr( "Player '%1' (%2) committed foul" ); break;
-            case MAT_PLAYER_FAULT_TECHNICAL:        return QObject::tr( "Player '%1' (%2) punished technical foul" ); break;
-            case MAT_PLAYER_FAULT_SUBSTITUTE:       return QObject::tr( "Player '%1' (%2) substituted due to max. fouls" ); break;
-            case MAT_PLAYER_SUBSTITUTE:             return QObject::tr( "Player substitution: '%1' (%2) <->  '%3' (%4)" ); break;
-            case MAT_TEAM_TIMEOUT:                  return QObject::tr( "Team requested timeout" ); break;
-            case MAT_TEAM_FAULT:                    return QObject::tr( "Team punished fault - %1" ); break;
-            case MAT_GAME_OVERTIME:                 return QObject::tr( "Overtime started" ); break;
-            case MAT_CUSTOM:                        return QObject::tr( "%1" ); break;
-            default:                                return QObject::tr( "Unknonw action" ); break;
+            case MAT_DEFAULT:                       return QObject::tr( "%1" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_1:                return QObject::tr( "Player %1 scored penalty" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_2:                return QObject::tr( "Player %1 scored short distant (2 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_3:                return QObject::tr( "Player %1 scored long distant (3 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_1_FAILED:         return QObject::tr( "Player %1 failed penalty" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_2_FAILED:         return QObject::tr( "Player %1 failed short distant (2 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_3_FAILED:         return QObject::tr( "Player %1 failed long distant (3 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_GAME:             return QObject::tr( "Player %1 committed foul" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_TECHNICAL:        return QObject::tr( "Player %1 punished technical foul" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_SUBSTITUTE:       return QObject::tr( "Player %1 substituted due to max. fouls" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SUBSTITUTE:             return QObject::tr( "Player substitution: %1" ).toStdString().c_str(); break;
+            case MAT_TEAM_TIMEOUT:                  return QObject::tr( "Team %1 requested timeout" ).toStdString().c_str(); break;
+            case MAT_TEAM_FAULT:                    return QObject::tr( "Team punished foul - %1" ).toStdString().c_str(); break;
+            case MAT_GAME_OVERTIME:                 return QObject::tr( "Overtime started" ).toStdString().c_str(); break;
+            case MAT_CUSTOM:                        return QObject::tr( "%1" ).toStdString().c_str(); break;
+            default:                                return QObject::tr( "Unknonw action" ).toStdString().c_str(); break;
         }
     }
+
+    static const char *toCode( teAction p_teAction )
+    {
+        switch( p_teAction )
+        {
+            case MAT_DEFAULT:                       return "---"; break;
+            case MAT_PLAYER_SCORE_1:                return "S1S"; break;
+            case MAT_PLAYER_SCORE_2:                return "S2S"; break;
+            case MAT_PLAYER_SCORE_3:                return "S3S"; break;
+            case MAT_PLAYER_SCORE_1_FAILED:         return "S1F"; break;
+            case MAT_PLAYER_SCORE_2_FAILED:         return "S2F"; break;
+            case MAT_PLAYER_SCORE_3_FAILED:         return "S3F"; break;
+            case MAT_PLAYER_FAULT_GAME:             return "FPG"; break;
+            case MAT_PLAYER_FAULT_TECHNICAL:        return "FPT"; break;
+            case MAT_PLAYER_FAULT_SUBSTITUTE:       return "FPS"; break;
+            case MAT_PLAYER_SUBSTITUTE:             return "SUP"; break;
+            case MAT_TEAM_TIMEOUT:                  return "TTO"; break;
+            case MAT_TEAM_FAULT:                    return "TTF"; break;
+            case MAT_GAME_OVERTIME:                 return "GOT"; break;
+            case MAT_CUSTOM:                        return "CUS"; break;
+            default:                                return "---"; break;
+        }
+    }
+
 };
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷

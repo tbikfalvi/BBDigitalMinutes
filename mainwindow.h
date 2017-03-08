@@ -52,12 +52,12 @@ private slots:
     void on_pbEditTeamGuest_clicked();
     void on_pbPlayerChangeHome_clicked();
     void on_pbPlayerChangeGuest_clicked();
-    void on_pbScore1Home_clicked();
+/*    void on_pbScore1Home_clicked();
     void on_pbScore2Home_clicked();
     void on_pbScore3Home_clicked();
     void on_pbScore1Guest_clicked();
     void on_pbScore2Guest_clicked();
-    void on_pbScore3Guest_clicked();
+    void on_pbScore3Guest_clicked();*/
     void on_pbFaultHome_clicked();
     void on_pbFaultGuest_clicked();
     void on_pbSettings_clicked();
@@ -81,6 +81,7 @@ private:
     QString                  qsTeamNameFromFile;
     int                      nTimerMainPlayTime;
     int                      nTimeMainMiliSec;
+    int                      nTimeMinuteMiliSec;
     int                      nTimerTimeDead;
     int                      nTimeDeadSecond;
     bool                     bTeamHomePlay;
@@ -126,6 +127,7 @@ private:
     void                    _updateScore( cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome = true );
     void                    _setPlayerFault( bool bHome = true );
     void                    _savePlayers( bool bHome = true );
+    void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
 };
 
 #endif // MAINWINDOW_H

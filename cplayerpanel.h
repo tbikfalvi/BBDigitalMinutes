@@ -37,6 +37,7 @@ public:
     int              playerNumber();
     QString          playerName();
     QString          playerWithNumber( QString p_qsSeparator = "\t" );
+    QString          playerAndNumber();
     void             setPlayerNumber( int p_nPlayerNumber );
     void             setPlayerName( QString p_qsPlayerName );
     void             setPlayerToField();
