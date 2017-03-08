@@ -19,444 +19,8 @@
 #include "dlgplayeredit.h"
 #include "dlgedit.h"
 #include "dlgsettings.h"
-
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-// Player panel class
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-
-//===========================================================================================================
-cSettings::cSettings()
-{
-    QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-
-    pQSetTeamHome   = new QSettings( QString( "%1/TeamHome.info"  ).arg( QDir::currentPath() ), QSettings::IniFormat );
-    pQSetTeamGuest  = new QSettings( QString( "%1/TeamGuest.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-    pQSetGameStatus = new QSettings( QString( "%1/Game.info"      ).arg( QDir::currentPath() ), QSettings::IniFormat );
-
-    // Application settings related
-    m_qsLang                = qsetApplication.value( "Lang",                    "en"    ).toString();
-    m_bReloadSizePos        = qsetApplication.value( "ReloadSizePos",           "false" ).toBool();
-    m_bReloadMinute         = qsetApplication.value( "ReloadMinute",            "false" ).toBool();
-    m_bSoundEnabled         = qsetApplication.value( "SoundEnabled",            "false" ).toBool();
-    m_bIsMinuteClosed       = qsetApplication.value( "MinuteClosed",            "false" ).toBool();
-    m_nWindowLeft           = qsetApplication.value( "MainWindow/Left",         0       ).toInt();
-    m_nWindowTop            = qsetApplication.value( "MainWindow/Top",          0       ).toInt();
-    m_nWindowWidth          = qsetApplication.value( "MainWindow/Width",        1500    ).toInt();
-    m_nWindowHeight         = qsetApplication.value( "MainWindow/Height",       1000    ).toInt();
-    m_nCountQuarters        = qsetApplication.value( "Game/QuarterCount",       4       ).toInt();
-    m_nTimeQuarter          = qsetApplication.value( "Game/QuarterTime",        10      ).toInt();
-    m_bOvertimeEnabled      = qsetApplication.value( "Game/OvertimeEnabled",    true    ).toBool();
-    m_nTimeOvertime         = qsetApplication.value( "Game/Overtime",           5       ).toInt();
-    m_nTimeTimeout          = qsetApplication.value( "Game/Timeout",            60      ).toInt();
-    m_bTimeOffenseUsed      = qsetApplication.value( "Game/OffenseTimeUsed",    false   ).toBool();
-    m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
-    m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
-}
-
-//===========================================================================================================
-cSettings::~cSettings()
-{
-    saveAppSettings();
-}
-
-//===========================================================================================================
-void cSettings::saveAppSettings()
-{
-    // Application settings related
-    QSettings   qsetApplication( QString( "%1/BBDigitalMinutes.info" ).arg( QDir::currentPath() ), QSettings::IniFormat );
-
-    qsetApplication.setValue( "Lang",                   m_qsLang                );
-    qsetApplication.setValue( "ReloadSizePos",          m_bReloadSizePos        );
-    qsetApplication.setValue( "ReloadMinute",           m_bReloadMinute         );
-    qsetApplication.setValue( "SoundEnabled",           m_bSoundEnabled         );
-    qsetApplication.setValue( "MinuteClosed",           m_bIsMinuteClosed       );
-    qsetApplication.setValue( "MainWindow/Left",        m_nWindowLeft           );
-    qsetApplication.setValue( "MainWindow/Top",         m_nWindowTop            );
-    qsetApplication.setValue( "MainWindow/Width",       m_nWindowWidth          );
-    qsetApplication.setValue( "MainWindow/Height",      m_nWindowHeight         );
-    qsetApplication.setValue( "Game/QuarterCount",      m_nCountQuarters        );
-    qsetApplication.setValue( "Game/QuarterTime",       m_nTimeQuarter          );
-    qsetApplication.setValue( "Game/OvertimeEnabled",   m_bOvertimeEnabled      );
-    qsetApplication.setValue( "Game/Overtime",          m_nTimeOvertime         );
-    qsetApplication.setValue( "Game/Timeout",           m_nTimeTimeout          );
-    qsetApplication.setValue( "Game/OffenseTimeUsed",   m_bTimeOffenseUsed      );
-    qsetApplication.setValue( "Game/OffenseTime",       m_nTimeOffense          );
-    qsetApplication.setValue( "Game/OffenseTimeExtend", m_nTimeOffenseExt       );
-}
-
-//===========================================================================================================
-QString cSettings::teamName(bool bHome)
-{
-    if( bHome ) return pQSetTeamHome->value( "TeamName",  QObject::tr("HOME team") ).toString();
-    else        return pQSetTeamGuest->value( "TeamName", QObject::tr("GUEST team") ).toString();
-}
-
-//===========================================================================================================
-void cSettings::setTeamName(bool bHome, QString name)
-{
-    if( bHome ) pQSetTeamHome->setValue( "TeamName", name );
-    else        pQSetTeamGuest->setValue( "TeamName", name );
-}
-
-//===========================================================================================================
-QStringList cSettings::players( bool bHome )
-{
-    QString qsPlayers;
-
-    if( bHome ) qsPlayers = pQSetTeamHome->value( "Players", "" ).toString();
-    else        qsPlayers = pQSetTeamGuest->value( "Players", "" ).toString();
-
-    return qsPlayers.split( "|" );
-}
-
-//===========================================================================================================
-void cSettings::setPlayers(bool bHome, QStringList players)
-{
-    if( bHome ) pQSetTeamHome->setValue( "Players", players.join( "|" ) );
-    else        pQSetTeamGuest->setValue( "Players", players.join( "|" ) );
-}
-
-//===========================================================================================================
-QStringList cSettings::playersField( bool bHome )
-{
-    QString qsPlayers;
-
-    if( bHome ) qsPlayers = pQSetTeamHome->value( "PlayersOnField", "" ).toString();
-    else        qsPlayers = pQSetTeamGuest->value( "PlayersOnField", "" ).toString();
-
-    return qsPlayers.split( "|" );
-}
-
-//===========================================================================================================
-void cSettings::setPlayersField(bool bHome, QStringList players)
-{
-    if( bHome ) pQSetTeamHome->setValue( "PlayersOnField", players.join( "|" ) );
-    else        pQSetTeamGuest->setValue( "PlayersOnField", players.join( "|" ) );
-}
-
-//===========================================================================================================
-int cSettings::score( bool bHome )
-{
-    if( bHome ) return pQSetGameStatus->value( "ScoreHome", "0" ).toInt();
-    else        return pQSetGameStatus->value( "ScoreGuest", "0" ).toInt();
-}
-
-//===========================================================================================================
-void cSettings::setScore( bool bHome, int score )
-{
-    if( bHome ) pQSetGameStatus->setValue( "ScoreHome", score );
-    else        pQSetGameStatus->setValue( "ScoreGuest", score );
-}
-
-//===========================================================================================================
-int cSettings::quarter()
-{
-    return pQSetGameStatus->value( "Quarter", "1" ).toInt();
-}
-
-//===========================================================================================================
-void cSettings::setQuarter(int quarter)
-{
-    return pQSetGameStatus->setValue( "Quarter", quarter );
-}
-
-//===========================================================================================================
-QString cSettings::minuteFileName()
-{
-    return pQSetGameStatus->value( "MinuteFileName", "" ).toString();
-}
-
-//===========================================================================================================
-void cSettings::setMinuteFileName(QString filename)
-{
-    return pQSetGameStatus->setValue( "MinuteFileName", filename );
-}
-
-//===========================================================================================================
-
-//===========================================================================================================
-void cSettings::createMinute(QString p_qsMinuteName)
-{
-    qsMinuteFileName = QString( "%1.dmin" ).arg( p_qsMinuteName );
-}
-
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-// Player panel class
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
-
-//===========================================================================================================
-cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QString p_qsPlayerName)
-{
-    nPlayerNumber   = p_qsPlayerNumber.toInt();
-    qsPlayerName    = p_qsPlayerName;
-    bPlayerOnField  = false;
-
-    nScores         = 0;
-    nCountSingle    = 0;
-    nCountDouble    = 0;
-    nCountTriple    = 0;
-    nCountFaults    = 0;
-    nCountFaults    = 0;
-
-    setParent( p_poParent );
-
-    QFont   qfPlayer;
-
-    qfPlayer.setPointSize( 10 );
-//    qfPlayer.setBold( true );
-
-    hlPlayer = new QHBoxLayout( this );
-    hlPlayer->setObjectName( QString::fromUtf8( "hlPlayer" ) );
-    hlPlayer->setSpacing( 0 );
-    hlPlayer->setMargin( 0 );
-
-    //-------------------------------------------------------------------------------------------------------
-    frmPlayerNumber = new QFrame( this );
-    frmPlayerNumber->setObjectName( QString::fromUtf8( "frmPlayerNumber" ) );
-    frmPlayerNumber->setMinimumWidth( 30 );
-    frmPlayerNumber->setMinimumHeight( 30 );
-    frmPlayerNumber->setMaximumWidth( 30 );
-    frmPlayerNumber->setMaximumHeight( 30 );
-    frmPlayerNumber->setFrameShape( QFrame::Panel );
-    frmPlayerNumber->setFrameShadow( QFrame::Raised );
-
-    lblPlayerNumber = new QLabel( frmPlayerNumber );
-    lblPlayerNumber->setObjectName( QString::fromUtf8( "lblPlayerNumber" ) );
-    lblPlayerNumber->setGeometry( 2, 2, 26, 26 );
-    lblPlayerNumber->setFont( qfPlayer );
-    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber ) );//, 2, 10, QChar( '0' ) ) );
-
-    hlPlayer->addWidget( frmPlayerNumber );
-
-    //-------------------------------------------------------------------------------------------------------
-    frmPlayerName = new QFrame( this );
-    frmPlayerName->setObjectName( QString::fromUtf8( "frmPlayerName" ) );
-    frmPlayerName->setMinimumHeight( 30 );
-    frmPlayerName->setMaximumHeight( 30 );
-    frmPlayerName->setFrameShape( QFrame::Panel );
-    frmPlayerName->setFrameShadow( QFrame::Raised );
-
-    lblPlayerName = new QLabel( frmPlayerName );
-    lblPlayerName->setObjectName( QString::fromUtf8( "lblPlayerName" ) );
-    lblPlayerName->setGeometry( 2, 2, 70, 26 );
-    lblPlayerName->setFont( qfPlayer );
-    lblPlayerName->setText( qsPlayerName );
-
-    hlPlayerName = new QHBoxLayout( frmPlayerName );
-    hlPlayerName->setObjectName( QString::fromUtf8( "hlPlayerName" ) );
-    hlPlayerName->setSpacing( 1 );
-    hlPlayerName->setMargin( 1 );
-    hlPlayerName->addWidget( lblPlayerName );
-
-    hlPlayer->addWidget( frmPlayerName );
-
-    //-------------------------------------------------------------------------------------------------------
-    frmFault = new QFrame( this );
-    frmFault->setObjectName( QString::fromUtf8( "frmFault" ) );
-    frmFault->setMinimumWidth( 112 );
-    frmFault->setMinimumHeight( 30 );
-    frmFault->setMaximumWidth( 112 );
-    frmFault->setMaximumHeight( 30 );
-    frmFault->setFrameShape( QFrame::Panel );
-    frmFault->setFrameShadow( QFrame::Raised );
-
-    lblPlayerFault1 = new QLabel( frmFault );
-    lblPlayerFault1->setObjectName( QString::fromUtf8( "lblPlayerFault1" ) );
-    lblPlayerFault1->setGeometry( 20, 20, 20, 20 );
-    lblPlayerFault1->setScaledContents( true );
-    lblPlayerFault1->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
-
-    lblPlayerFault2 = new QLabel( frmFault );
-    lblPlayerFault2->setObjectName( QString::fromUtf8( "lblPlayerFault2" ) );
-    lblPlayerFault2->setGeometry( 20, 20, 20, 20 );
-    lblPlayerFault2->setScaledContents( true );
-    lblPlayerFault2->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
-
-    lblPlayerFault3 = new QLabel( frmFault );
-    lblPlayerFault3->setObjectName( QString::fromUtf8( "lblPlayerFault3" ) );
-    lblPlayerFault3->setGeometry( 20, 20, 20, 20 );
-    lblPlayerFault3->setScaledContents( true );
-    lblPlayerFault3->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
-
-    lblPlayerFault4 = new QLabel( frmFault );
-    lblPlayerFault4->setObjectName( QString::fromUtf8( "lblPlayerFault4" ) );
-    lblPlayerFault4->setGeometry( 20, 20, 20, 20 );
-    lblPlayerFault4->setScaledContents( true );
-    lblPlayerFault4->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
-
-    lblPlayerFault5 = new QLabel( frmFault );
-    lblPlayerFault5->setObjectName( QString::fromUtf8( "lblPlayerFault5" ) );
-    lblPlayerFault5->setGeometry( 20, 20, 20, 20 );
-    lblPlayerFault5->setScaledContents( true );
-    lblPlayerFault5->setPixmap( QPixmap(":/resources/basketball_fault_inactive.png") );
-
-    hlFault = new QHBoxLayout( frmFault );
-    hlFault->setObjectName( QString::fromUtf8( "hlFault" ) );
-    hlFault->setSpacing( 2 );
-    hlFault->setMargin( 2 );
-
-    hlFault->addWidget( lblPlayerFault5 );
-    hlFault->addWidget( lblPlayerFault4 );
-    hlFault->addWidget( lblPlayerFault3 );
-    hlFault->addWidget( lblPlayerFault2 );
-    hlFault->addWidget( lblPlayerFault1 );
-
-    hlPlayer->addWidget( frmFault );
-
-    qsFrmPlayerNumber   = frmPlayerNumber->styleSheet();
-    qsLblPlayerNumber   = lblPlayerNumber->styleSheet();
-    qsFrmPlayerName     = frmPlayerName->styleSheet();
-    qsLblPlayerName     = lblPlayerName->styleSheet();
-}
-
-//===========================================================================================================
-cPanelPlayer::~cPanelPlayer()
-{
-}
-
-//===========================================================================================================
-int cPanelPlayer::playerNumber()
-{
-    return nPlayerNumber;
-}
-
-//===========================================================================================================
-QString cPanelPlayer::playerName()
-{
-    return qsPlayerName;
-}
-
-//===========================================================================================================
-QString cPanelPlayer::playerWithNumber( QString p_qsSeparator )
-{
-    return QString( "%1%2%3" ).arg( nPlayerNumber ).arg( p_qsSeparator ).arg( qsPlayerName );
-}
-
-//====================================================================================
-void cPanelPlayer::mousePressEvent ( QMouseEvent *p_poEvent )
-{
-    emit playerClicked( this );
-    p_poEvent->ignore();
-}
-
-//====================================================================================
-void cPanelPlayer::setPlayerNumber( int p_nPlayerNumber )
-{
-    nPlayerNumber = p_nPlayerNumber;
-    lblPlayerNumber->setText( QString( "%1" ).arg( nPlayerNumber ) );
-}
-
-//====================================================================================
-void cPanelPlayer::setPlayerName( QString p_qsPlayerName )
-{
-    qsPlayerName = p_qsPlayerName;
-    lblPlayerName->setText( qsPlayerName );
-}
-
-//====================================================================================
-void cPanelPlayer::setPlayerToField()
-{
-    bPlayerOnField = true;
-    lblPlayerNumber->setStyleSheet( "QLabel { background: rgb(0, 125, 0); font: bold; color: rgb(255, 255, 255); }" );
-    lblPlayerName->setStyleSheet( "QLabel { background: rgb(0, 125, 0); font: bold; color: rgb(255, 255, 255); }" );
-}
-
-//====================================================================================
-void cPanelPlayer::setPlayerToSubstitute()
-{
-    bPlayerOnField = false;
-    frmPlayerNumber->setStyleSheet( qsFrmPlayerNumber );
-    lblPlayerNumber->setStyleSheet( qsLblPlayerNumber );
-    frmPlayerName->setStyleSheet( qsFrmPlayerName );
-    lblPlayerName->setStyleSheet( qsLblPlayerName );
-}
-
-//====================================================================================
-void cPanelPlayer::removePlayer()
-{
-    hlFault->removeWidget( lblPlayerFault1 );
-    hlFault->removeWidget( lblPlayerFault2 );
-    hlFault->removeWidget( lblPlayerFault3 );
-    hlFault->removeWidget( lblPlayerFault4 );
-    hlFault->removeWidget( lblPlayerFault5 );
-
-    hlPlayerName->removeWidget( lblPlayerName );
-
-    hlPlayer->removeWidget( frmPlayerNumber );
-    hlPlayer->removeWidget( frmPlayerName );
-    hlPlayer->removeWidget( frmFault );
-
-    delete lblPlayerFault1;
-    delete lblPlayerFault2;
-    delete lblPlayerFault3;
-    delete lblPlayerFault4;
-    delete lblPlayerFault5;
-    delete frmFault;
-
-    delete lblPlayerName;
-    delete frmPlayerName;
-
-    delete lblPlayerNumber;
-    delete frmPlayerNumber;
-
-    delete hlPlayer;
-}
-
-//====================================================================================
-void cPanelPlayer::increaseScore( int p_nScore )
-{
-    nScores += p_nScore;
-
-    switch( p_nScore )
-    {
-        case 1:
-            increaseSingle();
-            break;
-        case 2:
-            increaseDouble();
-            break;
-        case 3:
-            increaseTriple();
-            break;
-      default:
-            break;
-    }
-}
-
-//====================================================================================
-void cPanelPlayer::setPlayerFault()
-{
-    nCountFaults++;
-
-    switch( nCountFaults )
-    {
-    case 1:
-        lblPlayerFault1->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
-        break;
-    case 2:
-        lblPlayerFault2->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
-        break;
-    case 3:
-        lblPlayerFault3->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
-        break;
-    case 4:
-        lblPlayerFault4->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
-        break;
-    case 5:
-        lblPlayerFault5->setPixmap( QPixmap(":/resources/basketball_fault_active.png") );
-        setPlayerToSubstitute();
-        lblPlayerNumber->setStyleSheet( "QLabel { background: rgb(255, 0, 0); font: bold; color: rgb(255, 255, 255); }" );
-        lblPlayerName->setStyleSheet( "QLabel { background: rgb(255, 0, 0); font: bold; color: rgb(255, 255, 255); }" );
-        emit playerDisqualified();
-        break;
-    default:
-        break;
-    }
-}
+#include "csettings.h"
+#include "dlglineedit.h"
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -474,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_stIcon->setIcon( QIcon(":/resources/basketball.png") );
     m_stIcon->show();
 
-    poSettings = new cSettings();
+    poSettings              = new cSettings();
+    poMinute                = new cMinute();
 
     nTimerMainPlayTime      = 0;
     nTimeMainMiliSec        = poSettings->timeQuarter() * 60000;
@@ -1850,7 +1415,30 @@ void MainWindow::on_pbSettings_clicked()
 
 void MainWindow::on_pbMinuteNew_clicked()
 {
-    m_bMinuteInProgress = true;
+    dlgLineEdit obLineEdit( this );
+
+    obLineEdit.setTitle( tr("Enter name of Minute") );
+    if( obLineEdit.exec() == QDialog::Accepted )
+    {
+        QStringList qslHome  = QStringList() << ui->lblTeamHome->text();
+        QStringList qslGuest = QStringList() << ui->lblTeamGuest->text();
+
+        for( int i=0; i<qvPanelPlayersHome.size(); i++ )
+        {
+            qslHome << qvPanelPlayersHome.at(i)->playerWithNumber("|");
+        }
+
+        for( int i=0; i<qvPanelPlayersGuest.size(); i++ )
+        {
+            qslGuest << qvPanelPlayersGuest.at(i)->playerWithNumber("|");
+        }
+
+        if( poMinute->createMinute( obLineEdit.value(), qslHome.join("#"), qslGuest.join("#") ) )
+        {
+            _showTrayInfo( tr("Minute '%1' created.").arg( obLineEdit.value() ) );
+            m_bMinuteInProgress = true;
+        }
+    }
 
     _enableControls();
 }

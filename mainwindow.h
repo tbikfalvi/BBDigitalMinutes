@@ -2,182 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QFrame>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QSystemTrayIcon>
 #include <QStringList>
-#include <QMouseEvent>
 #include <QSound>
-#include <QSettings>
 
-class cSettings
-{
+#include "csettings.h"
+#include "cplayerpanel.h"
+#include "cminute.h"
 
-public:
-    cSettings();
-    ~cSettings();
-
-    // Application settings related
-    QString          language()                                     { return m_qsLang;                  }
-    bool             isreloadsizepos()                              { return m_bReloadSizePos;          }
-    bool             isreloadminute()                               { return m_bReloadMinute;           }
-    bool             issoundenabled()                               { return m_bSoundEnabled;           }
-    int              left()                                         { return m_nWindowLeft;             }
-    int              top()                                          { return m_nWindowTop;              }
-    int              width()                                        { return m_nWindowWidth;            }
-    int              height()                                       { return m_nWindowHeight;           }
-    int              countquarters()                                { return m_nCountQuarters;          }
-    int              timeQuarter()                                  { return m_nTimeQuarter;            }
-    bool             isovertimeenabled()                            { return m_bOvertimeEnabled;        }
-    int              timeovertime()                                 { return m_nTimeOvertime;           }
-    int              timeout()                                      { return m_nTimeTimeout;            }
-    bool             istimeoffenseused()                            { return m_bTimeOffenseUsed;        }
-    int              timeOffense()                                  { return m_nTimeOffense;            }
-    int              timeOffenseExt()                               { return m_nTimeOffenseExt;         }
-
-    void             setAppLang( QString lang )                     { m_qsLang              = lang;     }
-    void             setReloadSizePos( bool reload )                { m_bReloadSizePos      = reload;   }
-    void             setReloadMinute( bool reload )                 { m_bReloadMinute       = reload;   }
-    void             setSoundEnabled( bool enabled )                { m_bSoundEnabled       = enabled;  }
-    void             setWindowPosSize( int x, int y, int w, int h ) { m_nWindowLeft         = x;
-                                                                      m_nWindowTop          = y;
-                                                                      m_nWindowWidth        = w;
-                                                                      m_nWindowHeight       = h;        }
-    void             setCountQuarters( int count )                  { m_nCountQuarters      = count;    }
-    void             setTimeQuarter( int quarter )                  { m_nTimeQuarter        = quarter;  }
-    void             setOvertimeEnabled( bool enabled )             { m_bOvertimeEnabled    = enabled;  }
-    void             setTimeOvertime( int time )                    { m_nTimeOvertime       = time;     }
-    void             setTimeout( int timeout )                      { m_nTimeTimeout        = timeout;  }
-    void             setTimeOffenseUsed( bool enabled )             { m_bTimeOffenseUsed    = enabled;  }
-    void             setTimeOffense( int offense )                  { m_nTimeOffense        = offense;  }
-    void             setTimeOffenseExt( int ext )                   { m_nTimeOffenseExt     = ext;      }
-
-    void             saveAppSettings();
-
-    // Minute related
-    bool             isMinuteClosed()                               { return m_bIsMinuteClosed;     }
-    void             createMinute( QString p_qsMinuteName );
-    void             loadMinute( QString p_qsFileName );
-    void             saveMinute();
-    void             closeMinute();
-
-    // Team related
-    QSettings       *pQSetTeamHome;
-    QSettings       *pQSetTeamGuest;
-    QSettings       *pQSetGameStatus;
-
-    QString          teamName( bool bHome = true );
-    QStringList      players( bool bHome = true );
-    QStringList      playersField( bool bHome = true );
-    int              score( bool bHome = true );
-    int              quarter();
-    QString          minuteFileName();
-
-    void             setTeamName( bool bHome = true, QString name = "" );                           //
-    void             setPlayers( bool bHome = true, QStringList players = QStringList("") );        //
-    void             setPlayersField( bool bHome = true, QStringList players = QStringList("") );   //
-    void             setScore(bool bHome = true , int score = 0 );                                  //
-    void             setQuarter( int quarter = 1 );                                                 //
-    void             setMinuteFileName( QString filename );
-
-private:
-
-    // Application settings related
-    QString          m_qsLang;
-    bool             m_bReloadSizePos;
-    bool             m_bReloadMinute;
-    bool             m_bSoundEnabled;
-    int              m_nWindowLeft;
-    int              m_nWindowTop;
-    int              m_nWindowWidth;
-    int              m_nWindowHeight;
-    int              m_nCountQuarters;
-    int              m_nTimeQuarter;
-    bool             m_bOvertimeEnabled;
-    int              m_nTimeOvertime;
-    int              m_nTimeTimeout;
-    int              m_bTimeOffenseUsed;
-    int              m_nTimeOffense;
-    int              m_nTimeOffenseExt;
-
-    // Minute related
-    bool             m_bIsMinuteClosed;
-    QString          qsMinuteFileName;
-
-    // Home team related
-    QString          m_qsNameTeamHome;
-    int              m_nCountPlayersHome;
-    QStringList      m_qslPlayersHome;
-
-    // Guest team related
-    QString          m_qsNameTeamGuest;
-
-};
-
-class cPanelPlayer : public QFrame
-{
-    Q_OBJECT
-
-public:
-    QHBoxLayout     *hlPlayer;
-    QFrame          *frmPlayerNumber;
-    QLabel          *lblPlayerNumber;
-    QHBoxLayout     *hlPlayerName;
-    QFrame          *frmPlayerName;
-    QLabel          *lblPlayerName;
-    QHBoxLayout     *hlFault;
-    QFrame          *frmFault;
-    QLabel          *lblPlayerFault1;
-    QLabel          *lblPlayerFault2;
-    QLabel          *lblPlayerFault3;
-    QLabel          *lblPlayerFault4;
-    QLabel          *lblPlayerFault5;
-
-    cPanelPlayer( QWidget *p_poParent = 0, QString p_qsPlayerNumber = "", QString p_qsPlayerName = "" );
-    ~cPanelPlayer();
-
-    int              playerNumber();
-    QString          playerName();
-    QString          playerWithNumber( QString p_qsSeparator = "\t" );
-    void             setPlayerNumber( int p_nPlayerNumber );
-    void             setPlayerName( QString p_qsPlayerName );
-    void             setPlayerToField();
-    void             setPlayerToSubstitute();
-    void             removePlayer();
-    void             increaseScore( int p_nScore );
-    void             setPlayerFault();
-
-    int              playerFaults()                 {   return nCountFaults;                }
-    bool             isPlayerOnField()              {   return bPlayerOnField;              }
-    bool             isEnabledToPlay()              {   return (nCountFaults<5?true:false); }
-
-signals:
-    void playerClicked( cPanelPlayer *poThis );
-    void playerDisqualified();
-
-protected:
-    void mousePressEvent ( QMouseEvent *p_poEvent );
-
-private:
-    QString          qsFrmPlayerNumber;
-    QString          qsLblPlayerNumber;
-    QString          qsFrmPlayerName;
-    QString          qsLblPlayerName;
-
-    int              nPlayerNumber;
-    QString          qsPlayerName;
-    bool             bPlayerOnField;
-    int              nScores;
-    int              nCountSingle;
-    int              nCountDouble;
-    int              nCountTriple;
-    int              nCountFaults;
-
-    void             increaseSingle()               {   nCountSingle++;                     }
-    void             increaseDouble()               {   nCountDouble++;                     }
-    void             increaseTriple()               {   nCountTriple++;                     }
-};
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Main window class
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 
 namespace Ui { class MainWindow; }
 
@@ -239,6 +76,7 @@ private:
     cPanelPlayer            *pPlayerToField;
     QPoint                   posMenu;
     cSettings               *poSettings;
+    cMinute                 *poMinute;
 
     QString                  qsTeamNameFromFile;
     int                      nTimerMainPlayTime;

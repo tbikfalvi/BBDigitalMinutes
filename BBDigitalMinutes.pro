@@ -1,32 +1,42 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-02-12T10:26:49
+# BBDigital Minutes pro file
 #
 #-------------------------------------------------
 
-QT       += core gui
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = BBDigitalMinutes
-TEMPLATE = app
-TRANSLATIONS = BBDigitalMinutes_hu.ts \
+TEMPLATE     = app
+QT          += core gui xml
+DESTDIR      = ..
+TARGET       = BBDigitalMinutes
 
-RESOURCES   += bbdigitalminutes.qrc
+TRANSLATIONS = BBDigitalMinutes_hu.ts
+
 RC_FILE      = bbdigitalminutes.rc
+RESOURCES   += bbdigitalminutes.qrc
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    dlgplayeredit.cpp \
-    dlgedit.cpp \
-    dlgsettings.cpp
+HEADERS     += mainwindow.h \
+               dlgplayeredit.h \
+               dlgedit.h \
+               dlgsettings.h \
+    csettings.h \
+    cplayerpanel.h \
+    cminute.h \
+    dlglineedit.h
 
-HEADERS  += mainwindow.h \
-    dlgplayeredit.h \
-    dlgedit.h \
-    dlgsettings.h
+SOURCES     += main.cpp\
+               mainwindow.cpp \
+               dlgplayeredit.cpp \
+               dlgedit.cpp \
+               dlgsettings.cpp \
+    csettings.cpp \
+    cplayerpanel.cpp \
+    cminute.cpp \
+    dlglineedit.cpp
 
-FORMS    += mainwindow.ui \
-    dlgplayeredit.ui \
-    dlgedit.ui \
-    dlgsettings.ui
+FORMS       += mainwindow.ui \
+               dlgplayeredit.ui \
+               dlgedit.ui \
+               dlgsettings.ui \
+    dlgLineEdit.ui
