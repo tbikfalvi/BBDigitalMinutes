@@ -34,6 +34,8 @@ public:
     bool             istimeoffenseused()                            { return m_bTimeOffenseUsed;        }
     int              timeOffense()                                  { return m_nTimeOffense;            }
     int              timeOffenseExt()                               { return m_nTimeOffenseExt;         }
+    bool             autoSaveMinute()                               { return m_bAutoSaveMinute;         }
+    int              autoSaveMinuteMin()                            { return m_nAutoSaveMinute;         }
 
     void             setAppLang( QString lang )                     { m_qsLang              = lang;     }
     void             setReloadSizePos( bool reload )                { m_bReloadSizePos      = reload;   }
@@ -51,6 +53,8 @@ public:
     void             setTimeOffenseUsed( bool enabled )             { m_bTimeOffenseUsed    = enabled;  }
     void             setTimeOffense( int offense )                  { m_nTimeOffense        = offense;  }
     void             setTimeOffenseExt( int ext )                   { m_nTimeOffenseExt     = ext;      }
+    void             setAutoSaveMinute( bool enabled )              { m_bAutoSaveMinute     = enabled;  }
+    void             setAutoSaveMinuteMin( int value )              { m_nAutoSaveMinute     = value;    }
 
     void             saveAppSettings();
 
@@ -92,6 +96,8 @@ private:
     int              m_bTimeOffenseUsed;
     int              m_nTimeOffense;
     int              m_nTimeOffenseExt;
+    bool             m_bAutoSaveMinute;
+    int              m_nAutoSaveMinute;
 
     // Home team related
     QString          m_qsNameTeamHome;

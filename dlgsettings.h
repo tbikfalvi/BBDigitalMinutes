@@ -27,6 +27,8 @@ private slots:
     void on_cmbLang_currentIndexChanged(const QString &arg1);
     void on_pbReset_clicked();
 
+    void on_chkAutoSaveMinute_clicked(bool checked);
+
 private:
     Ui::dlgSettings     *ui;
     cSettings           *poSettings;

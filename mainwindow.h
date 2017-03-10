@@ -28,6 +28,7 @@ public:
 
 protected:
     void timerEvent( QTimerEvent *p_poEvent );
+    void resizeEvent(QResizeEvent *event);
 
 private slots:
     void slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel );
@@ -40,8 +41,7 @@ private slots:
     void on_pbEditMainTime_clicked();
     void on_pbSaveMainTime_clicked();
     void on_pbCancelSaveMainTime_clicked();
-    void on_pbRequestTimeHome_clicked();
-    void on_pbRequestTimeGuest_clicked();
+    void on_pbRequestTime_clicked();
     void on_pbHomePlay_clicked();
     void on_pbGuestPlay_clicked();
     void on_pnIncreaseQuarter_clicked();
@@ -63,6 +63,9 @@ private slots:
     void on_pbSettings_clicked();
     void on_pbMinuteNew_clicked();
     void on_pbAttempt_clicked();
+    void on_pbCloseMinute_clicked();
+
+    void on_pbMinuteSave_clicked();
 
 private:
 
@@ -96,6 +99,8 @@ private:
     bool                     m_bMinuteInProgress;
     bool                     m_bSelectPlayersToField;
     bool                     m_bGameInProgress;
+    int                      m_nMinuteRowCount;
+    int                      m_nTimerAutoSaveMinute;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();
@@ -128,6 +133,7 @@ private:
     void                    _setPlayerFault( bool bHome = true );
     void                    _savePlayers( bool bHome = true );
     void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
+    void                    _resizeMinuteTableColumns();
 };
 
 #endif // MAINWINDOW_H

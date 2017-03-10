@@ -25,6 +25,8 @@ dlgSettings::dlgSettings(QWidget *parent, cSettings *p_poSettings) : QDialog(par
     ui->ledLengthOffense->setText( QString::number( poSettings->timeOffense() ) );
     ui->ledLengthOffenseExtended->setText( QString::number( poSettings->timeOffenseExt() ) );
     ui->ledLengthTimeout->setText( QString::number( poSettings->timeout() ) );
+    ui->chkAutoSaveMinute->setChecked( poSettings->autoSaveMinute() );
+    ui->ledAutoSaveMinute->setText( QString::number( poSettings->autoSaveMinuteMin() ) );
 }
 
 dlgSettings::~dlgSettings()
@@ -75,6 +77,8 @@ void dlgSettings::on_pbOk_clicked()
     poSettings->setTimeOffense( ui->ledLengthOffense->text().toInt() );
     poSettings->setTimeOffenseExt( ui->ledLengthOffenseExtended->text().toInt() );
     poSettings->setTimeout( ui->ledLengthTimeout->text().toInt() );
+    poSettings->setAutoSaveMinute( ui->chkAutoSaveMinute->isChecked() );
+    poSettings->setAutoSaveMinuteMin( ui->ledAutoSaveMinute->text().toInt() );
 
     QDialog::accept();
 }
@@ -97,4 +101,9 @@ void dlgSettings::on_pbReset_clicked()
     ui->chkOffensTimeUsed->setChecked( false );
     ui->ledLengthOffenseExtended->setText( "14" );
     ui->ledLengthTimeout->setText( "60" );
+}
+
+void dlgSettings::on_chkAutoSaveMinute_clicked(bool checked)
+{
+    ui->ledAutoSaveMinute->setEnabled( checked );
 }

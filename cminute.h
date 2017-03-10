@@ -37,17 +37,17 @@ public:
         switch( p_teAction )
         {
             case MAT_DEFAULT:                       return QObject::tr( "%1" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_1:                return QObject::tr( "Player %1 scored penalty" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_2:                return QObject::tr( "Player %1 scored short distant (2 points) throw" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_3:                return QObject::tr( "Player %1 scored long distant (3 points) throw" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_1_FAILED:         return QObject::tr( "Player %1 failed penalty" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_2_FAILED:         return QObject::tr( "Player %1 failed short distant (2 points) throw" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SCORE_3_FAILED:         return QObject::tr( "Player %1 failed long distant (3 points) throw" ).toStdString().c_str(); break;
-            case MAT_PLAYER_FAULT_GAME:             return QObject::tr( "Player %1 committed foul" ).toStdString().c_str(); break;
-            case MAT_PLAYER_FAULT_TECHNICAL:        return QObject::tr( "Player %1 punished technical foul" ).toStdString().c_str(); break;
-            case MAT_PLAYER_FAULT_SUBSTITUTE:       return QObject::tr( "Player %1 substituted due to max. fouls" ).toStdString().c_str(); break;
-            case MAT_PLAYER_SUBSTITUTE:             return QObject::tr( "Player substitution: %1" ).toStdString().c_str(); break;
-            case MAT_TEAM_TIMEOUT:                  return QObject::tr( "Team %1 requested timeout" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_1:                return QObject::tr( "%1 scored penalty" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_2:                return QObject::tr( "%1 scored short distant (2 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_3:                return QObject::tr( "%1 scored long distant (3 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_1_FAILED:         return QObject::tr( "%1 failed penalty" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_2_FAILED:         return QObject::tr( "%1 failed short distant (2 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SCORE_3_FAILED:         return QObject::tr( "%1 failed long distant (3 points) throw" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_GAME:             return QObject::tr( "%1 committed foul" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_TECHNICAL:        return QObject::tr( "%1 punished technical foul" ).toStdString().c_str(); break;
+            case MAT_PLAYER_FAULT_SUBSTITUTE:       return QObject::tr( "%1 substituted due to max. fouls" ).toStdString().c_str(); break;
+            case MAT_PLAYER_SUBSTITUTE:             return QObject::tr( "Substitution: %1" ).toStdString().c_str(); break;
+            case MAT_TEAM_TIMEOUT:                  return QObject::tr( "%1 requested timeout" ).toStdString().c_str(); break;
             case MAT_TEAM_FAULT:                    return QObject::tr( "Team punished foul - %1" ).toStdString().c_str(); break;
             case MAT_GAME_OVERTIME:                 return QObject::tr( "Overtime started" ).toStdString().c_str(); break;
             case MAT_CUSTOM:                        return QObject::tr( "%1" ).toStdString().c_str(); break;
@@ -82,6 +82,22 @@ public:
 
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Team types class
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+
+class cTeamType
+{
+public:
+    enum teAction
+    {
+        HOME = 0,
+        GUEST
+    };
+};
+
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 // Minute class
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
@@ -92,7 +108,8 @@ public:
     cMinute();
     ~cMinute();
 
-    bool             isMinuteClosed()                               { return m_bIsMinuteClosed;     }
+    QString          minuteName()                               { return qsMinuteName;          }
+    bool             isMinuteClosed()                           { return m_bIsMinuteClosed;     }
     bool             createMinute(QString p_qsMinuteName,
                                   QString p_qsTeamHome,
                                   QString p_qsTeamGuest);

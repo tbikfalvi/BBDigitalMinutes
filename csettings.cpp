@@ -30,6 +30,8 @@ cSettings::cSettings()
     m_bTimeOffenseUsed      = qsetApplication.value( "Game/OffenseTimeUsed",    false   ).toBool();
     m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
     m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
+    m_bAutoSaveMinute       = qsetApplication.value( "Minute/AutoSaveEnabled",  false   ).toBool();
+    m_nAutoSaveMinute       = qsetApplication.value( "Minute/AutoSaveMinute",   1       ).toInt();
 }
 
 //===========================================================================================================
@@ -61,6 +63,8 @@ void cSettings::saveAppSettings()
     qsetApplication.setValue( "Game/OffenseTimeUsed",   m_bTimeOffenseUsed      );
     qsetApplication.setValue( "Game/OffenseTime",       m_nTimeOffense          );
     qsetApplication.setValue( "Game/OffenseTimeExtend", m_nTimeOffenseExt       );
+    qsetApplication.setValue( "Minute/AutoSaveEnabled", m_bAutoSaveMinute       );
+    qsetApplication.setValue( "Minute/AutoSaveMinute",  m_nAutoSaveMinute       );
 }
 
 //===========================================================================================================
