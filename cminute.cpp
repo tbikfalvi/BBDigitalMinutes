@@ -3,11 +3,13 @@
 #include <QFile>
 #include <QDir>
 #include <QXmlStreamWriter>
+#include <QTextStream>
 
 #include "cminute.h"
 
 cMinute::cMinute()
 {
+    m_obDoc          = new QDomDocument();
     m_bIsMinuteClosed   = false;
     qsMinuteFileName    = "";
     qsMinuteName        = "";
@@ -33,79 +35,154 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
         return false;
     }
 
-    QFile   file( qsMinuteFile );
+    QDomElement qdMinute        = m_obDoc->createElement( "Minute" );
+    QDomElement qdMinuteHeader  = m_obDoc->createElement( "MinuteHeader" );
+    QDomElement qdName          = m_obDoc->createElement( "Name" );
+    QDomElement qdStart         = m_obDoc->createElement( "Start" );
+    QDomElement qdTeamHome      = m_obDoc->createElement( "TeamHOME" );
+    QDomElement qdTeamGuest     = m_obDoc->createElement( "TeamGUEST" );
+    QDomElement qdMinuteActions = m_obDoc->createElement( "Actions" );
 
-    if( file.open(QFile::WriteOnly | QFile::Text) )
+    qdName.setNodeValue( qsMinuteName );
+    qdStart.setAttribute( "Date", QDate::currentDate().toString( "yyyy-MM-dd" ) );
+    qdTeamHome.setAttribute( "Name", qslHome.at(0) );
+    qdTeamGuest.setAttribute( "Name", qslGuest.at(0) );
+
+    qdMinuteHeader.appendChild( qdName );
+    qdMinuteHeader.appendChild( qdStart );
+    qdMinuteHeader.appendChild( qdTeamHome );
+    qdMinuteHeader.appendChild( qdTeamGuest );
+
+    for( int i=1; i<qslHome.size(); i++ )
     {
-        QXmlStreamWriter    xmlWriter( &file );
+        QStringList qslPlayer   = qslHome.at(i).split("|");
+        QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
 
-        xmlWriter.setAutoFormatting( true );
-        xmlWriter.writeStartDocument();
+        qdPlayer.setAttribute( "Number", qslPlayer.at(0) );
+        qdPlayer.setAttribute( "Name", qslPlayer.at(1) );
+        qdPlayer.setAttribute( "Foul", 0 );
 
-            xmlWriter.writeStartElement( "MinuteHeader" );
-
-                xmlWriter.writeTextElement("Name", qsMinuteName );
-                xmlWriter.writeStartElement( "Start" );
-                    xmlWriter.writeAttribute("Date", QDate::currentDate().toString( "yyyy-MM-dd" ) );
-                    xmlWriter.writeAttribute("Time", QTime::currentTime().toString( "hh:mm" ) );
-                xmlWriter.writeEndElement();
-
-                xmlWriter.writeStartElement( "Team HOME" );
-                    xmlWriter.writeAttribute("Name", qslHome.at(0) );
-
-                    for( int i=1; i<qslHome.size(); i++ )
-                    {
-                        QStringList qslPlayer = qslHome.at(i).split("|");
-
-                        xmlWriter.writeStartElement( "Player" );
-                        xmlWriter.writeAttribute("Number", qslPlayer.at(0) );
-                        xmlWriter.writeAttribute("Name", qslPlayer.at(1) );
-                        xmlWriter.writeEndElement();
-                    }
-
-                xmlWriter.writeEndElement();
-
-                xmlWriter.writeStartElement( "Team GUEST" );
-                    xmlWriter.writeAttribute("Name", qslGuest.at(0) );
-
-                    for( int i=1; i<qslGuest.size(); i++ )
-                    {
-                        QStringList qslPlayer = qslGuest.at(i).split("|");
-
-                        xmlWriter.writeStartElement( "Player" );
-                        xmlWriter.writeAttribute("Number", qslPlayer.at(0) );
-                        xmlWriter.writeAttribute("Name", qslPlayer.at(1) );
-                        xmlWriter.writeEndElement();
-                    }
-
-                xmlWriter.writeEndElement();
-
-            xmlWriter.writeEndElement();
-
-        xmlWriter.writeEndDocument();
-
-        file.close();
+        qdTeamHome.appendChild( qdPlayer );
     }
+
+    for( int i=1; i<qslGuest.size(); i++ )
+    {
+        QStringList qslPlayer   = qslGuest.at(i).split("|");
+        QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
+
+        qdPlayer.setAttribute( "Number", qslPlayer.at(0) );
+        qdPlayer.setAttribute( "Name", qslPlayer.at(1) );
+        qdPlayer.setAttribute( "Foul", 0 );
+
+        qdTeamGuest.appendChild( qdPlayer );
+    }
+
+    qdMinute.appendChild( qdMinuteHeader );
+    qdMinute.appendChild( qdMinuteActions );
+    m_obDoc->appendChild( qdMinute );
+
     return true;
 }
 
-void cMinute::loadMinute( QString p_qsFileName )
+void cMinute::loadMinute( QString /*p_qsFileName*/ )
 {
 
 }
 
 void cMinute::saveMinute()
 {
+    QFile   file( qsMinuteFile );
 
+    if( file.open(QFile::WriteOnly | QFile::Text) )
+    {
+/*        QByteArray xmlMinute = m_obDoc->toByteArray();
+
+        file.write(xmlMinute);*/
+        QTextStream stream( &file );
+        stream << m_obDoc->toString();
+        file.close();
+    }
 }
 
 void cMinute::closeMinute()
 {
-
 }
 
-void cMinute::addAction( cMinActionType::teAction p_teAction, QString p_qsParameters )
+void cMinute::addAction( int p_nTimeMilisec, cTeamType::teType p_teType, cMinActionType::teAction p_teAction, QString p_qsParameters )
 {
+    QDomElement qdMinute        = m_obDoc->documentElement();
+    QDomElement qdMinuteAction  = qdMinute.elementsByTagName( "Actions" ).at(0).toElement();
+    QDomElement qdAction        = m_obDoc->createElement( "Action" );
+    QString     qsTimeStamp     = QString( "%1:%2:%3" ).arg( p_nTimeMilisec/60000, 2, 10, QChar( '0' ) )
+                                                       .arg( (p_nTimeMilisec%60000)/1000, 2, 10, QChar( '0' ) )
+                                                       .arg( ((p_nTimeMilisec%60000)%1000)/10, 2, 10, QChar( '0' ) );
+    QString     qsTeamCode      = "";
 
+    if( p_teType == cTeamType::HOME )   qsTeamCode = "H";
+    else                                qsTeamCode = "G";
+
+    qdAction.setAttribute( "Time", qsTimeStamp );
+    qdAction.setAttribute( "Code", QString( "%1%2" ).arg( qsTeamCode )
+                                                    .arg( cMinActionType::toCode( p_teAction ) ) );
+    qdAction.setAttribute( "Text", QString( cMinActionType::toStr( p_teAction ) ).arg( p_qsParameters ) );
+
+    qdMinuteAction.appendChild( qdAction );
+}
+
+void cMinute::updateTeam( cTeamType::teType p_teType, QString p_qsName )
+{
+    QString qsTeam;
+
+    if( p_teType == cTeamType::HOME )   qsTeam = "TeamHOME";
+    else                                qsTeam = "TeamGUEST";
+
+    QDomElement qdMinute    = m_obDoc->documentElement();
+    QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
+    qdTeam.setAttribute( "Name", p_qsName );
+}
+
+void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
+{
+    if( p_qslPlayer.size() != 3 )   return;
+
+    QString qsTeam;
+
+    if( p_teType == cTeamType::HOME )   qsTeam = "TeamHOME";
+    else                                qsTeam = "TeamGUEST";
+
+    QDomElement qdMinute    = m_obDoc->documentElement();
+    QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
+    QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
+
+    qdPlayer.setAttribute( "Number", p_qslPlayer.at(0) );
+    qdPlayer.setAttribute( "Name", p_qslPlayer.at(1) );
+    qdPlayer.setAttribute( "Foul", p_qslPlayer.at(2) );
+
+    qdTeam.appendChild( qdPlayer );
+}
+
+void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
+{
+    if( p_qslPlayer.size() != 3 )   return;
+
+    QString qsTeam;
+
+    if( p_teType == cTeamType::HOME )   qsTeam = "TeamHOME";
+    else                                qsTeam = "TeamGUEST";
+
+    QDomElement qdMinute    = m_obDoc->documentElement();
+    QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
+
+    for( int i=0; i<qdTeam.childNodes().count(); i++ )
+    {
+        QDomElement qdPlayer = qdTeam.childNodes().at(i).toElement();
+
+        if( qdPlayer.attribute( "Number" ).compare( p_qslPlayer.at(0) ) == 0 )
+        {
+            qdPlayer.setAttribute( "Name", p_qslPlayer.at(1) );
+            qdPlayer.setAttribute( "Foul", p_qslPlayer.at(2) );
+            break;
+        }
+    }
 }
 

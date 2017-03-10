@@ -123,7 +123,7 @@ private:
     void                    _deletePlayer( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome = true );
-    void                    _processTeamNamePopupMenu( QLabel *poLblName );
+    void                    _processTeamNamePopupMenu( bool bHome = true );
     bool                    _isPlayerAllowedToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _selectPlayerFromField( bool bHome = true );
     void                    _selectPlayerFromSubstitute( bool bHome = true );
@@ -133,7 +133,7 @@ private:
     void                    _setPlayerFault( bool bHome = true );
     void                    _savePlayers( bool bHome = true );
     void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
-    void                    _resizeMinuteTableColumns();
+    void                    _updateTeamName( bool bHome = true, QString p_qsName = "" );
 };
 
 #endif // MAINWINDOW_H
