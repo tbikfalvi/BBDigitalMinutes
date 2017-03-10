@@ -22,5 +22,9 @@
         <file>resources/cancel.png</file>
         <file>resources/decrease.png</file>
         <file>resources/increase.png</file>
+        <file>resources/folder.png</file>
+        <file>resources/basketball_player_in.png</file>
+        <file>resources/basketball_player_out.png</file>
+        <file>resources/delete.png</file>
     </qresource>
 </RCC>
