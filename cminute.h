@@ -122,6 +122,7 @@ public:
     void             updateTeam( cTeamType::teType p_teType, QString p_qsName );
     void             addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer );
     void             updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer );
+    void             deletePlayer( cTeamType::teType p_teType, QString p_qsPlayerId );
 
 private:
 

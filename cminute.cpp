@@ -29,18 +29,16 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
 
     QDomElement qdMinute        = m_obDoc->createElement( "Minute" );
     QDomElement qdMinuteHeader  = m_obDoc->createElement( "MinuteHeader" );
-    QDomElement qdName          = m_obDoc->createElement( "Name" );
     QDomElement qdStart         = m_obDoc->createElement( "Start" );
     QDomElement qdTeamHome      = m_obDoc->createElement( "TeamHOME" );
     QDomElement qdTeamGuest     = m_obDoc->createElement( "TeamGUEST" );
     QDomElement qdMinuteActions = m_obDoc->createElement( "Actions" );
 
-    qdName.setNodeValue( qsMinuteName );
+    qdMinute.setAttribute( "Name", qsMinuteName );
     qdStart.setAttribute( "Date", QDate::currentDate().toString( "yyyy-MM-dd" ) );
     qdTeamHome.setAttribute( "Name", p_qsTeamHome );
     qdTeamGuest.setAttribute( "Name", p_qsTeamGuest );
 
-    qdMinuteHeader.appendChild( qdName );
     qdMinuteHeader.appendChild( qdStart );
     qdMinuteHeader.appendChild( qdTeamHome );
     qdMinuteHeader.appendChild( qdTeamGuest );
@@ -140,7 +138,7 @@ void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer 
 
     QDomElement qdMinute    = m_obDoc->documentElement();
     QDomElement qdHeader    = qdMinute.elementsByTagName( "MinuteHeader" ).at(0).toElement();
-    QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
+    QDomElement qdTeam      = qdHeader.elementsByTagName( qsTeam ).at(0).toElement();
 
     for( int i=0; i<qdTeam.childNodes().count(); i++ )
     {
@@ -159,6 +157,29 @@ void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer 
     if( bPlayerNotFound )
     {
         addPlayer( p_teType, p_qslPlayer );
+    }
+}
+
+void cMinute::deletePlayer(cTeamType::teType p_teType, QString p_qsPlayerId)
+{
+    QString qsTeam;
+
+    if( p_teType == cTeamType::HOME )   qsTeam = "TeamHOME";
+    else                                qsTeam = "TeamGUEST";
+
+    QDomElement qdMinute    = m_obDoc->documentElement();
+    QDomElement qdHeader    = qdMinute.elementsByTagName( "MinuteHeader" ).at(0).toElement();
+    QDomElement qdTeam      = qdHeader.elementsByTagName( qsTeam ).at(0).toElement();
+
+    for( int i=0; i<qdTeam.childNodes().count(); i++ )
+    {
+        QDomElement qdPlayer = qdTeam.childNodes().at(i).toElement();
+
+        if( qdPlayer.attribute( "Id" ).compare( p_qsPlayerId ) == 0 )
+        {
+            qdTeam.removeChild( qdPlayer );
+            break;
+        }
     }
 }
 

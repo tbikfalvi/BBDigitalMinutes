@@ -1349,6 +1349,9 @@ void MainWindow::_deletePlayer(cPanelPlayer *poPlayerPanel, bool bHome)
         pQWPlayers = ui->vlPlayersGuest;
     }
 
+    if( poMinute ) poMinute->deletePlayer( ( bHome ? cTeamType::HOME : cTeamType::GUEST ),
+                                           QString::number( poPlayerPanel->playerId() ) );
+
     for( int i=0; i<pQLPlayers->size(); i++ )
     {
         if( pQLPlayers->at(i) == poPlayerPanel )
