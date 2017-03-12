@@ -591,21 +591,18 @@ void MainWindow::on_pbMinuteNew_clicked()
         ui->tbMinute->setColumnWidth( 2, (ui->tbMinute->width()-140)/2 );
         ui->tbMinute->horizontalHeader()->setVisible( true );
 
-        QStringList qslHome  = QStringList() << ui->lblTeamHome->text();
-        QStringList qslGuest = QStringList() << ui->lblTeamGuest->text();
-
-        for( int i=0; i<qvPanelPlayersHome.size(); i++ )
+        if( poMinute->createMinute( obLineEdit.value(), ui->lblTeamHome->text(), ui->lblTeamGuest->text() ) )
         {
-            qslHome << qvPanelPlayersHome.at(i)->playerWithNumber("|");
-        }
+            for( int i=0; i<qvPanelPlayersHome.size(); i++ )
+            {
+                poMinute->addPlayer( cTeamType::HOME, qvPanelPlayersHome.at(i)->playerStringList() );
+            }
 
-        for( int i=0; i<qvPanelPlayersGuest.size(); i++ )
-        {
-            qslGuest << qvPanelPlayersGuest.at(i)->playerWithNumber("|");
-        }
+            for( int i=0; i<qvPanelPlayersGuest.size(); i++ )
+            {
+                poMinute->addPlayer( cTeamType::GUEST, qvPanelPlayersGuest.at(i)->playerStringList() );
+            }
 
-        if( poMinute->createMinute( obLineEdit.value(), qslHome.join("#"), qslGuest.join("#") ) )
-        {
             _showTrayInfo( tr("Minute '%1' created.").arg( obLineEdit.value() ) );
             m_bMinuteInProgress = true;
             if( poSettings->autoSaveMinute() )
@@ -844,7 +841,7 @@ void MainWindow::_importPlayersFromFile()
 }
 
 //====================================================================================
-void MainWindow::_addPlayerManually(bool addHome, bool addMultiplePlayers)
+void MainWindow::_addPlayerManually(bool bHome, bool addMultiplePlayers)
 {
     dlgPlayerEdit   obDlgPlayerEdit( this );
 
@@ -859,7 +856,7 @@ void MainWindow::_addPlayerManually(bool addHome, bool addMultiplePlayers)
             if( nRet == QDialog::Accepted )
             {
                 qslImportedPlayers << QString( "%1\t%2" ).arg( obDlgPlayerEdit.playerNumber() ).arg( obDlgPlayerEdit.playerName() );
-                _addPlayers( addHome );
+                _addPlayers( bHome );
             }
 
         } while( nRet == QDialog::Accepted );
@@ -871,7 +868,7 @@ void MainWindow::_addPlayerManually(bool addHome, bool addMultiplePlayers)
         if( obDlgPlayerEdit.exec() == QDialog::Accepted )
         {
             qslImportedPlayers << QString( "%1\t%2" ).arg( obDlgPlayerEdit.playerNumber() ).arg( obDlgPlayerEdit.playerName() );
-            _addPlayers( addHome );
+            _addPlayers( bHome );
         }
     }
 }
@@ -929,9 +926,10 @@ void MainWindow::_addPlayersToHome()
                 }
                 if( poMinute )
                 {
-                    QStringList qslPlayerMinute = QStringList() << QString::number(poPlayer->playerNumber())
+                    QStringList qslPlayerMinute = QStringList() << QString::number( poPlayer->playerId() )
+                                                                << QString::number( poPlayer->playerNumber() )
                                                                 << poPlayer->playerName()
-                                                                << QString("0");
+                                                                << QString( "0" );
                     poMinute->addPlayer( cTeamType::HOME, qslPlayerMinute );
                 }
             }
@@ -986,9 +984,10 @@ void MainWindow::_addPlayersToGuest()
                 }
                 if( poMinute )
                 {
-                    QStringList qslPlayerMinute = QStringList() << QString::number(poPlayer->playerNumber())
+                    QStringList qslPlayerMinute = QStringList() << QString::number( poPlayer->playerId() )
+                                                                << QString::number( poPlayer->playerNumber() )
                                                                 << poPlayer->playerName()
-                                                                << QString("0");
+                                                                << QString( "0" );
                     poMinute->addPlayer( cTeamType::GUEST, qslPlayerMinute );
                 }
             }

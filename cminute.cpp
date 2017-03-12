@@ -27,14 +27,6 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
     qsMinuteFileName    = QString( "%1_%2.dmin" ).arg( qsMinuteName ).arg( QDateTime::currentDateTime().toString( "yyyyMMddhhmm" ) );
     qsMinuteFile        = QString( "%1/%2" ).arg( QDir::currentPath() ).arg( qsMinuteFileName );
 
-    QStringList qslHome = p_qsTeamHome.split("#");
-    QStringList qslGuest= p_qsTeamGuest.split("#");
-
-    if( qslHome.size() < 1 || qslGuest.size() < 1 )
-    {
-        return false;
-    }
-
     QDomElement qdMinute        = m_obDoc->createElement( "Minute" );
     QDomElement qdMinuteHeader  = m_obDoc->createElement( "MinuteHeader" );
     QDomElement qdName          = m_obDoc->createElement( "Name" );
@@ -45,37 +37,13 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
 
     qdName.setNodeValue( qsMinuteName );
     qdStart.setAttribute( "Date", QDate::currentDate().toString( "yyyy-MM-dd" ) );
-    qdTeamHome.setAttribute( "Name", qslHome.at(0) );
-    qdTeamGuest.setAttribute( "Name", qslGuest.at(0) );
+    qdTeamHome.setAttribute( "Name", p_qsTeamHome );
+    qdTeamGuest.setAttribute( "Name", p_qsTeamGuest );
 
     qdMinuteHeader.appendChild( qdName );
     qdMinuteHeader.appendChild( qdStart );
     qdMinuteHeader.appendChild( qdTeamHome );
     qdMinuteHeader.appendChild( qdTeamGuest );
-
-    for( int i=1; i<qslHome.size(); i++ )
-    {
-        QStringList qslPlayer   = qslHome.at(i).split("|");
-        QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
-
-        qdPlayer.setAttribute( "Number", qslPlayer.at(0) );
-        qdPlayer.setAttribute( "Name", qslPlayer.at(1) );
-        qdPlayer.setAttribute( "Foul", 0 );
-
-        qdTeamHome.appendChild( qdPlayer );
-    }
-
-    for( int i=1; i<qslGuest.size(); i++ )
-    {
-        QStringList qslPlayer   = qslGuest.at(i).split("|");
-        QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
-
-        qdPlayer.setAttribute( "Number", qslPlayer.at(0) );
-        qdPlayer.setAttribute( "Name", qslPlayer.at(1) );
-        qdPlayer.setAttribute( "Foul", 0 );
-
-        qdTeamGuest.appendChild( qdPlayer );
-    }
 
     qdMinute.appendChild( qdMinuteHeader );
     qdMinute.appendChild( qdMinuteActions );
@@ -148,7 +116,8 @@ void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
     else                                qsTeam = "TeamGUEST";
 
     QDomElement qdMinute    = m_obDoc->documentElement();
-    QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
+    QDomElement qdHeader    = qdMinute.elementsByTagName( "MinuteHeader" ).at(0).toElement();
+    QDomElement qdTeam      = qdHeader.elementsByTagName( qsTeam ).at(0).toElement();
     QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
 
     qdPlayer.setAttribute( "Id", p_qslPlayer.at(0) );
@@ -170,6 +139,7 @@ void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer 
     else                                qsTeam = "TeamGUEST";
 
     QDomElement qdMinute    = m_obDoc->documentElement();
+    QDomElement qdHeader    = qdMinute.elementsByTagName( "MinuteHeader" ).at(0).toElement();
     QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
 
     for( int i=0; i<qdTeam.childNodes().count(); i++ )

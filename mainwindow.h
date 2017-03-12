@@ -113,7 +113,7 @@ private:
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
     void                    _importPlayersFromFile();
-    void                    _addPlayerManually( bool addHome = true, bool addMultiplePlayers = false );
+    void                    _addPlayerManually(bool bHome = true, bool addMultiplePlayers = false );
     void                    _addPlayers( bool addHome = true );
     void                    _addPlayersToHome();
     void                    _addPlayersToGuest();

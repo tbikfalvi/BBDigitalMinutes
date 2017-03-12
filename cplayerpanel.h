@@ -43,6 +43,8 @@ public:
 
     QString          playerWithNumber( QString p_qsSeparator = "\t" );
     QString          playerAndNumber();
+    QStringList      playerStringList();
+
     void             setPlayerNumber( int p_nPlayerNumber );
     void             setPlayerName( QString p_qsPlayerName );
     void             setPlayerToField();

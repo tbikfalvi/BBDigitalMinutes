@@ -149,6 +149,16 @@ QString cPanelPlayer::playerAndNumber()
     return QString( "%1 (%2)" ).arg( qsPlayerName ).arg( nPlayerNumber );
 }
 
+//===========================================================================================================
+QStringList cPanelPlayer::playerStringList()
+{
+    QStringList qslPlayer = QStringList() << QString::number( playerId() )
+                                          << QString::number( playerNumber() )
+                                          << playerName()
+                                          << QString::number( playerFaults() );
+    return qslPlayer;
+}
+
 //====================================================================================
 void cPanelPlayer::mousePressEvent ( QMouseEvent *p_poEvent )
 {
