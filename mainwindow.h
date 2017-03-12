@@ -101,6 +101,7 @@ private:
     bool                     m_bGameInProgress;
     int                      m_nMinuteRowCount;
     int                      m_nTimerAutoSaveMinute;
+    int                      m_nPlayerId;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();
@@ -134,6 +135,8 @@ private:
     void                    _savePlayers( bool bHome = true );
     void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
     void                    _updateTeamName( bool bHome = true, QString p_qsName = "" );
+    bool                    _isPlayerNumberAssigned(  bool bHome, int p_nNumber );
+
 };
 
 #endif // MAINWINDOW_H

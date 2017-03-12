@@ -69,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     m_nTimerAutoSaveMinute  = 0;
 
+    m_nPlayerId             = 0;
+
     pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
 
     _updateMainPlayTime();
@@ -892,10 +894,19 @@ void MainWindow::_addPlayersToHome()
         {
             QStringList  qslPlayer  = qsPlayer.split( "\t" );
             QString      qsName     = QString( qslPlayer.at(1) ).remove("\n");
+            int          nNumber    = qslPlayer.at(0).toInt();
+
+            if( _isPlayerNumberAssigned( true, nNumber ) )
+            {
+                QMessageBox::warning( this, tr("Warning"),
+                                      tr( "This number (%1) already assigned to one of the players.\n"
+                                          "Please select another number for player\n'%2'").arg( nNumber ).arg( qsName ) );
+                continue;
+            }
 
             if( qsName.length() > 0 )
             {
-                cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
+                cPanelPlayer *poPlayer = new cPanelPlayer( this, ++m_nPlayerId, QString::number(nNumber), qsName );
 
                 connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelHomeClicked(cPanelPlayer*)) );
                 connect( poPlayer, SIGNAL(playerDisqualified()),         this, SLOT(slotPlayerHomeDisqualified()) );
@@ -940,10 +951,19 @@ void MainWindow::_addPlayersToGuest()
         {
             QStringList  qslPlayer  = qsPlayer.split( "\t" );
             QString      qsName     = QString( qslPlayer.at(1) ).remove("\n");
+            int          nNumber    = qslPlayer.at(0).toInt();
+
+            if( _isPlayerNumberAssigned( false, nNumber ) )
+            {
+                QMessageBox::warning( this, tr("Warning"),
+                                      tr( "This number (%1) already assigned to one of the players.\n"
+                                      "Please select another number for player\n'%2'").arg( nNumber ).arg( qsName ) );
+                continue;
+            }
 
             if( qsName.length() > 0 )
             {
-                cPanelPlayer *poPlayer = new cPanelPlayer( this, qslPlayer.at(0), qsName );
+                cPanelPlayer *poPlayer = new cPanelPlayer( this, ++m_nPlayerId, QString::number(nNumber), qsName );
 
                 connect( poPlayer, SIGNAL(playerClicked(cPanelPlayer*)), this, SLOT(slotPlayerPanelGuestClicked(cPanelPlayer*)) );
                 connect( poPlayer, SIGNAL(playerDisqualified()),         this, SLOT(slotPlayerGuestDisqualified()) );
@@ -1173,10 +1193,30 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
 
         if( obDlgPlayerEdit.exec() == QDialog::Accepted )
         {
+            if( poPlayerPanel->playerNumber() != obDlgPlayerEdit.playerNumber() )
+            {
+                if( _isPlayerNumberAssigned( bHome, obDlgPlayerEdit.playerNumber() ) )
+                {
+                    QMessageBox::warning( this, tr("Warning"),
+                                          tr( "This number (%1) already assigned to another player.\n"
+                                          "Please select another number for this player'").arg( obDlgPlayerEdit.playerNumber() ) );
+                    return;
+                }
+            }
             poPlayerPanel->setPlayerNumber( obDlgPlayerEdit.playerNumber() );
             poPlayerPanel->setPlayerName( obDlgPlayerEdit.playerName() );
             if( bHome ) _reorderPlayersHome();
             else        _reorderPlayersGuest();
+
+            QStringList qslPlayer = QStringList() << QString::number( poPlayerPanel->playerId() )
+                                                  << QString::number( poPlayerPanel->playerNumber() )
+                                                  << poPlayerPanel->playerName()
+                                                  << QString::number( poPlayerPanel->playerFaults() );
+            if( poMinute )
+            {
+                poMinute->updatePlayer( ( bHome ? cTeamType::HOME : cTeamType::GUEST ),
+                                        qslPlayer );
+            }
         }
     }
     else if( qaRet == &qaPlayerToField )
@@ -1761,4 +1801,26 @@ void MainWindow::_updateTeamName(bool bHome, QString p_qsName)
     {
         poMinute->updateTeam( ( bHome ? cTeamType::HOME : cTeamType::GUEST ), p_qsName );
     }
+}
+
+//===========================================================================================================
+bool MainWindow::_isPlayerNumberAssigned( bool bHome, int p_nNumber )
+{
+    QList<cPanelPlayer*>    *pQLPlayers = NULL;
+
+    if( bHome ) {   pQLPlayers = &qvPanelPlayersHome;   }
+    else        {   pQLPlayers = &qvPanelPlayersGuest;  }
+
+    QStringList qslPlayers;
+    QStringList qslPlayersField;
+
+    for( int i=0; i<pQLPlayers->size(); i++ )
+    {
+        if( pQLPlayers->at(i)->playerNumber() == p_nNumber )
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

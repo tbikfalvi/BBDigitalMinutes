@@ -7,8 +7,9 @@
 //÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 
 //===========================================================================================================
-cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QString p_qsPlayerName)
+cPanelPlayer::cPanelPlayer(QWidget *p_poParent, int p_nPlayerId, QString p_qsPlayerNumber, QString p_qsPlayerName)
 {
+    nPlayerId       = p_nPlayerId;
     nPlayerNumber   = p_qsPlayerNumber.toInt();
     qsPlayerName    = p_qsPlayerName;
     bPlayerOnField  = false;
@@ -134,18 +135,6 @@ cPanelPlayer::cPanelPlayer(QWidget *p_poParent, QString p_qsPlayerNumber, QStrin
 //===========================================================================================================
 cPanelPlayer::~cPanelPlayer()
 {
-}
-
-//===========================================================================================================
-int cPanelPlayer::playerNumber()
-{
-    return nPlayerNumber;
-}
-
-//===========================================================================================================
-QString cPanelPlayer::playerName()
-{
-    return qsPlayerName;
 }
 
 //===========================================================================================================

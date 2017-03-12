@@ -95,9 +95,6 @@ void cMinute::saveMinute()
 
     if( file.open(QFile::WriteOnly | QFile::Text) )
     {
-/*        QByteArray xmlMinute = m_obDoc->toByteArray();
-
-        file.write(xmlMinute);*/
         QTextStream stream( &file );
         stream << m_obDoc->toString();
         file.close();
@@ -143,7 +140,7 @@ void cMinute::updateTeam( cTeamType::teType p_teType, QString p_qsName )
 
 void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
 {
-    if( p_qslPlayer.size() != 3 )   return;
+    if( p_qslPlayer.size() != 4 )   return;
 
     QString qsTeam;
 
@@ -154,18 +151,20 @@ void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
     QDomElement qdTeam      = qdMinute.elementsByTagName( qsTeam ).at(0).toElement();
     QDomElement qdPlayer    = m_obDoc->createElement( "Player" );
 
-    qdPlayer.setAttribute( "Number", p_qslPlayer.at(0) );
-    qdPlayer.setAttribute( "Name", p_qslPlayer.at(1) );
-    qdPlayer.setAttribute( "Foul", p_qslPlayer.at(2) );
+    qdPlayer.setAttribute( "Id", p_qslPlayer.at(0) );
+    qdPlayer.setAttribute( "Number", p_qslPlayer.at(1) );
+    qdPlayer.setAttribute( "Name", p_qslPlayer.at(2) );
+    qdPlayer.setAttribute( "Foul", p_qslPlayer.at(3) );
 
     qdTeam.appendChild( qdPlayer );
 }
 
 void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
 {
-    if( p_qslPlayer.size() != 3 )   return;
+    if( p_qslPlayer.size() != 4 )   return;
 
     QString qsTeam;
+    bool    bPlayerNotFound = true;
 
     if( p_teType == cTeamType::HOME )   qsTeam = "TeamHOME";
     else                                qsTeam = "TeamGUEST";
@@ -177,12 +176,19 @@ void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer 
     {
         QDomElement qdPlayer = qdTeam.childNodes().at(i).toElement();
 
-        if( qdPlayer.attribute( "Number" ).compare( p_qslPlayer.at(0) ) == 0 )
+        if( qdPlayer.attribute( "Id" ).compare( p_qslPlayer.at(0) ) == 0 )
         {
-            qdPlayer.setAttribute( "Name", p_qslPlayer.at(1) );
-            qdPlayer.setAttribute( "Foul", p_qslPlayer.at(2) );
+            bPlayerNotFound = false;
+            qdPlayer.setAttribute( "Number", p_qslPlayer.at(1) );
+            qdPlayer.setAttribute( "Name", p_qslPlayer.at(2) );
+            qdPlayer.setAttribute( "Foul", p_qslPlayer.at(3) );
             break;
         }
+    }
+
+    if( bPlayerNotFound )
+    {
+        addPlayer( p_teType, p_qslPlayer );
     }
 }
 
