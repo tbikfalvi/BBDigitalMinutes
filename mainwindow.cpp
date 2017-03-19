@@ -640,7 +640,7 @@ void MainWindow::on_pbAttempt_clicked()
 }
 
 //===========================================================================================================
-void MainWindow::on_pbCloseMinute_clicked()
+void MainWindow::on_pbMinuteClose_clicked()
 {
     m_bMinuteInProgress = false;
     killTimer( m_nTimerAutoSaveMinute );
@@ -648,6 +648,7 @@ void MainWindow::on_pbCloseMinute_clicked()
     poMinute->closeMinute();
     poMinute->saveMinute();
     _showTrayInfo( tr( "Minute '%1' closed." ).arg( poMinute->minuteName() ) );
+    _enableControls();
 }
 
 //===========================================================================================================
@@ -698,7 +699,8 @@ void MainWindow::_enableControls()
     // Minute related
     ui->pbMinuteNew->setEnabled( !m_bMinuteInProgress );
     ui->pbMinuteSave->setEnabled( m_bMinuteInProgress );
-    ui->pbCloseMinute->setEnabled( m_bMinuteInProgress );
+    ui->pbMinuteClose->setEnabled( m_bMinuteInProgress );
+    ui->pbMinuteAddCustomText->setEnabled( m_bMinuteInProgress );
 
 // -----------------------------------------------------------------------------------------------
 // OBSOLETE but don't delete maybe later it will be used
@@ -1125,6 +1127,10 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
     qaPlayerScore3.setEnabled( poPlayerPanel->isPlayerOnField() );
     qaPlayerScore3.setFont( qfItems );
 
+    QAction qaPlayerFoul( QIcon( ":/resources/basketball_player_fault.png" ),tr("Player comitted foul ..."), &qmMenu );
+    qaPlayerFoul.setEnabled( poPlayerPanel->isPlayerOnField() );
+    qaPlayerFoul.setFont( qfItems );
+
     QAction qaPlayerToField( QIcon( ":/resources/basketball_player_in.png" ),tr("Move player to field ..."), &qmMenu );
     qaPlayerToField.setEnabled( _isPlayerAllowedToField( poPlayerPanel, bHome ) );
     qaPlayerToField.setFont( qfItems );
@@ -1144,6 +1150,8 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
     qmMenu.addAction( &qaPlayerScore1 );
     qmMenu.addAction( &qaPlayerScore2 );
     qmMenu.addAction( &qaPlayerScore3 );
+    qmMenu.addSeparator();
+    qmMenu.addAction( &qaPlayerFoul );
     qmMenu.addSeparator();
     qmMenu.addAction( &qaPlayerToField );
     qmMenu.addAction( &qaPlayerToSubstitute );
@@ -1198,6 +1206,17 @@ void MainWindow::_processPlayerPopupMenu(cPanelPlayer *poPlayerPanel, bool bHome
             _updateScore( poPlayerPanel, 0, bHome );
             _addMinuteAction( cMinActionType::MAT_PLAYER_SCORE_3_FAILED, poPlayerPanel->playerAndNumber(), bHome );
         }
+    }
+    else if( qaRet == &qaPlayerFoul )
+    {
+        poPlayerPanel->setPlayerFault();
+        QStringList qslPlayer = QStringList() << QString::number( poPlayerPanel->playerId() )
+                                              << QString::number( poPlayerPanel->playerNumber() )
+                                              << poPlayerPanel->playerName()
+                                              << QString::number( poPlayerPanel->playerFaults() );
+        poMinute->updatePlayer( (bHome ? cTeamType::HOME : cTeamType::GUEST), qslPlayer );
+        _addMinuteAction( cMinActionType::MAT_PLAYER_FAULT_GAME, poPlayerPanel->playerAndNumber(), bHome );
+        _savePlayers( bHome );
     }
     else if( qaRet == &qaPlayerEdit )
     {
@@ -1680,6 +1699,7 @@ void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool
         on_pbHomePlay_clicked();
         poSettings->setScore( bHome, nScoreGuest );
     }
+    if( nScoreValue> 0 && poSettings->timerStopAfterScore() ) on_pbSignalReferee_clicked();
     poPlayerPanel->increaseScore( nScoreValue );
 }
 
@@ -1858,4 +1878,42 @@ bool MainWindow::_isPlayerNumberAssigned( bool bHome, int p_nNumber )
 void MainWindow::on_pbReset_clicked()
 {
 
+}
+
+void MainWindow::on_pbMinuteAddCustomText_clicked()
+{
+    dlgLineEdit obDlgLineEdit( this );
+
+    QMessageBox qmsgQuestion( this );
+
+    qmsgQuestion.setWindowTitle( tr("Question") );
+    qmsgQuestion.setText( tr("To which team do you want to add new entry?") );
+    qmsgQuestion.setIcon( QMessageBox::Question );
+    qmsgQuestion.addButton( QString("  %1  ").arg( ui->lblTeamHome->text() ), QMessageBox::YesRole );
+    qmsgQuestion.addButton( QString("  %1  ").arg( ui->lblTeamGuest->text() ), QMessageBox::NoRole );
+
+    cTeamType::teType   ctTeam  = cTeamType::HOME;
+    int                 nRet    = qmsgQuestion.exec();
+
+    if( nRet == 0 ) ctTeam  = cTeamType::HOME;
+    else            ctTeam  = cTeamType::GUEST;
+
+    obDlgLineEdit.setTitle( tr("Add custom minute entry") );
+    if( obDlgLineEdit.exec() == QDialog::Accepted )
+    {
+        int     nColumn         = ( ctTeam == cTeamType::HOME ? 0 : 2 );
+
+        QTableWidgetItem *newItem = new QTableWidgetItem( obDlgLineEdit.value() );
+        ui->tbMinute->setWordWrap( true );
+        ui->tbMinute->setRowCount( ++m_nMinuteRowCount );
+        ui->tbMinute->setItem( m_nMinuteRowCount-1, nColumn, newItem );
+
+        ui->tbMinute->resizeRowToContents( m_nMinuteRowCount-1 );
+        ui->tbMinute->scrollToBottom();
+        poMinute->addAction( nTimeMinuteMiliSec,
+                             ctTeam,
+                             cMinActionType::MAT_CUSTOM,
+                             ui->ledCountQuarter->text().toInt(),
+                             obDlgLineEdit.value() );
+    }
 }

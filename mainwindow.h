@@ -63,11 +63,10 @@ private slots:
     void on_pbSettings_clicked();
     void on_pbMinuteNew_clicked();
     void on_pbAttempt_clicked();
-    void on_pbCloseMinute_clicked();
-
+    void on_pbMinuteClose_clicked();
     void on_pbMinuteSave_clicked();
-
     void on_pbReset_clicked();
+    void on_pbMinuteAddCustomText_clicked();
 
 private:
 
