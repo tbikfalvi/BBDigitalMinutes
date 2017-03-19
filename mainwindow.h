@@ -67,6 +67,8 @@ private slots:
 
     void on_pbMinuteSave_clicked();
 
+    void on_pbReset_clicked();
+
 private:
 
     Ui::MainWindow          *ui;
@@ -102,6 +104,8 @@ private:
     int                      m_nMinuteRowCount;
     int                      m_nTimerAutoSaveMinute;
     int                      m_nPlayerId;
+    int                      m_nQuarterScoreHome;
+    int                      m_nQuarterScoreGuest;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();

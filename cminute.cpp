@@ -1,3 +1,5 @@
+//===========================================================================================================
+//===========================================================================================================
 
 #include <QDateTime>
 #include <QFile>
@@ -5,8 +7,11 @@
 #include <QXmlStreamWriter>
 #include <QTextStream>
 
+//===========================================================================================================
+
 #include "cminute.h"
 
+//===========================================================================================================
 cMinute::cMinute()
 {
     m_obDoc          = new QDomDocument();
@@ -16,11 +21,13 @@ cMinute::cMinute()
     qsMinuteFile        = "";
 }
 
+//===========================================================================================================
 cMinute::~cMinute()
 {
 
 }
 
+//===========================================================================================================
 bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QString p_qsTeamGuest )
 {
     qsMinuteName        = p_qsMinuteName;
@@ -33,6 +40,7 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
     QDomElement qdTeamHome      = m_obDoc->createElement( "TeamHOME" );
     QDomElement qdTeamGuest     = m_obDoc->createElement( "TeamGUEST" );
     QDomElement qdMinuteActions = m_obDoc->createElement( "Actions" );
+    QDomElement qdResults       = m_obDoc->createElement( "Results" );
 
     qdMinute.setAttribute( "Name", qsMinuteName );
     qdStart.setAttribute( "Date", QDate::currentDate().toString( "yyyy-MM-dd" ) );
@@ -43,18 +51,32 @@ bool cMinute::createMinute( QString p_qsMinuteName, QString p_qsTeamHome, QStrin
     qdMinuteHeader.appendChild( qdTeamHome );
     qdMinuteHeader.appendChild( qdTeamGuest );
 
+    for( int i=1; i<5; i++ )
+    {
+        QDomElement qdQuarter       = m_obDoc->createElement( "Result" );
+
+        qdQuarter.setAttribute( "Quarter", i );
+        qdQuarter.setAttribute( "ScoreHome", 0 );
+        qdQuarter.setAttribute( "ScoreGuest", 0 );
+
+        qdResults.appendChild( qdQuarter );
+    }
+
     qdMinute.appendChild( qdMinuteHeader );
     qdMinute.appendChild( qdMinuteActions );
+    qdMinute.appendChild( qdResults );
     m_obDoc->appendChild( qdMinute );
 
     return true;
 }
 
+//===========================================================================================================
 void cMinute::loadMinute( QString /*p_qsFileName*/ )
 {
 
 }
 
+//===========================================================================================================
 void cMinute::saveMinute()
 {
     QFile   file( qsMinuteFile );
@@ -67,11 +89,33 @@ void cMinute::saveMinute()
     }
 }
 
+//===========================================================================================================
 void cMinute::closeMinute()
 {
+    QDomElement qdMinute        = m_obDoc->documentElement();
+    QDomElement qdResults       = qdMinute.elementsByTagName( "Results" ).at(0).toElement();
+    QDomElement qdQuarter       = m_obDoc->createElement( "Result" );
+
+    int nScoreHome  = 0;
+    int nScoreGuest = 0;
+
+    for( int i=0; i<qdResults.childNodes().count(); i++ )
+    {
+        QDomElement qdResult = qdResults.childNodes().at(i).toElement();
+
+        nScoreHome  += qdResult.attribute( "ScoreHome" ).toInt();
+        nScoreGuest += qdResult.attribute( "ScoreGuest" ).toInt();
+    }
+
+    qdQuarter.setAttribute( "Quarter", "Final" );
+    qdQuarter.setAttribute( "ScoreHome", nScoreHome );
+    qdQuarter.setAttribute( "ScoreGuest", nScoreGuest );
+
+    qdResults.appendChild( qdQuarter );
 }
 
-void cMinute::addAction( int p_nTimeMilisec, cTeamType::teType p_teType, cMinActionType::teAction p_teAction, QString p_qsParameters )
+//===========================================================================================================
+void cMinute::addAction(int p_nTimeMilisec, cTeamType::teType p_teType, cMinActionType::teAction p_teAction, int p_nQuarter, QString p_qsParameters, int p_nScoreHome , int p_nScoreGuest )
 {
     QDomElement qdMinute        = m_obDoc->documentElement();
     QDomElement qdMinuteAction  = qdMinute.elementsByTagName( "Actions" ).at(0).toElement();
@@ -85,13 +129,21 @@ void cMinute::addAction( int p_nTimeMilisec, cTeamType::teType p_teType, cMinAct
     else                                qsTeamCode = "G";
 
     qdAction.setAttribute( "Time", qsTimeStamp );
+    qdAction.setAttribute( "Quarter", p_nQuarter );
     qdAction.setAttribute( "Code", QString( "%1%2" ).arg( qsTeamCode )
                                                     .arg( cMinActionType::toCode( p_teAction ) ) );
     qdAction.setAttribute( "Text", QString( cMinActionType::toStr( p_teAction ) ).arg( p_qsParameters ) );
 
+    if( p_nScoreHome > -1 && p_nScoreGuest > -1 )
+    {
+        qdAction.setAttribute( "ScoreHome", QString::number( p_nScoreHome ) );
+        qdAction.setAttribute( "ScoreGuest", QString::number( p_nScoreGuest ) );
+    }
+
     qdMinuteAction.appendChild( qdAction );
 }
 
+//===========================================================================================================
 void cMinute::updateTeam( cTeamType::teType p_teType, QString p_qsName )
 {
     QString qsTeam;
@@ -104,6 +156,7 @@ void cMinute::updateTeam( cTeamType::teType p_teType, QString p_qsName )
     qdTeam.setAttribute( "Name", p_qsName );
 }
 
+//===========================================================================================================
 void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
 {
     if( p_qslPlayer.size() != 4 )   return;
@@ -126,6 +179,7 @@ void cMinute::addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
     qdTeam.appendChild( qdPlayer );
 }
 
+//===========================================================================================================
 void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer )
 {
     if( p_qslPlayer.size() != 4 )   return;
@@ -160,6 +214,7 @@ void cMinute::updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer 
     }
 }
 
+//===========================================================================================================
 void cMinute::deletePlayer(cTeamType::teType p_teType, QString p_qsPlayerId)
 {
     QString qsTeam;
@@ -181,5 +236,49 @@ void cMinute::deletePlayer(cTeamType::teType p_teType, QString p_qsPlayerId)
             break;
         }
     }
+}
+
+//===========================================================================================================
+void cMinute::updateScore(int p_nQuarter, int p_nScoreHome, int p_nScoreGuest)
+{
+    QDomElement qdMinute        = m_obDoc->documentElement();
+    QDomElement qdResults       = qdMinute.elementsByTagName( "Results" ).at(0).toElement();
+
+    for( int i=0; i<qdResults.childNodes().count(); i++ )
+    {
+        QDomElement qdResult = qdResults.childNodes().at(i).toElement();
+
+        if( qdResult.attribute( "Quarter" ).toInt() == p_nQuarter )
+        {
+            qdResult.setAttribute( "ScoreHome", QString::number( p_nScoreHome ) );
+            qdResult.setAttribute( "ScoreGuest", QString::number( p_nScoreGuest ) );
+            break;
+        }
+    }
+}
+
+//===========================================================================================================
+int cMinute::getQuarterScore( cTeamType::teType p_teType, int p_nQuarter )
+{
+    int     nRet = 0;
+    QString qsAttribute;
+
+    if( p_teType == cTeamType::HOME )   qsAttribute = "ScoreHome";
+    else                                qsAttribute = "ScoreGuest";
+
+    QDomElement qdMinute        = m_obDoc->documentElement();
+    QDomElement qdResults       = qdMinute.elementsByTagName( "Results" ).at(0).toElement();
+
+    for( int i=0; i<qdResults.childNodes().count(); i++ )
+    {
+        QDomElement qdResult = qdResults.childNodes().at(i).toElement();
+
+        if( qdResult.attribute( "Quarter" ).toInt() == p_nQuarter )
+        {
+            nRet = qdResult.attribute( qsAttribute ).toInt();
+            break;
+        }
+    }
+    return nRet;
 }
 

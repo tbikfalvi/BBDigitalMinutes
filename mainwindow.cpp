@@ -71,7 +71,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     m_nPlayerId             = 0;
 
-    pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );    
+    m_nQuarterScoreHome     = 0;
+    m_nQuarterScoreGuest    = 0;
+
+    pSoundWhistle = new QSound( QString( "%1/referee_whistle.wav" ).arg( QDir::currentPath() ) );
 
     _updateMainPlayTime();
 
@@ -100,6 +103,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->frmEventsHome->setVisible( false );
     ui->frmEventsGuest->setEnabled( false );
     ui->frmEventsGuest->setVisible( false );
+
+    ui->pb_3->setVisible( false );
+    ui->pb_4->setVisible( false );
+    ui->pb_5->setVisible( false );
+    ui->pb_6->setVisible( false );
 }
 
 //===========================================================================================================
@@ -416,6 +424,8 @@ void MainWindow::on_pnIncreaseQuarter_clicked()
                 nTimeMainMiliSec = poSettings->timeovertime() * 60000;
                 _updateMainPlayTime();
             }
+            m_nQuarterScoreHome     = poMinute->getQuarterScore( cTeamType::HOME, ui->ledCountQuarter->text().toInt() );
+            m_nQuarterScoreGuest    = poMinute->getQuarterScore( cTeamType::GUEST, ui->ledCountQuarter->text().toInt() );
         }
     }
     _enableControls();
@@ -433,6 +443,8 @@ void MainWindow::on_pnDecreaseQuarter_clicked()
                                    QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
         {
             ui->ledCountQuarter->setText( QString::number( ui->ledCountQuarter->text().toInt()-1 ) );
+            m_nQuarterScoreHome     = poMinute->getQuarterScore( cTeamType::HOME, ui->ledCountQuarter->text().toInt() );
+            m_nQuarterScoreGuest    = poMinute->getQuarterScore( cTeamType::GUEST, ui->ledCountQuarter->text().toInt() );
         }
     }
     _enableControls();
@@ -634,6 +646,7 @@ void MainWindow::on_pbCloseMinute_clicked()
     killTimer( m_nTimerAutoSaveMinute );
     m_nTimerAutoSaveMinute = 0;
     poMinute->closeMinute();
+    poMinute->saveMinute();
     _showTrayInfo( tr( "Minute '%1' closed." ).arg( poMinute->minuteName() ) );
 }
 
@@ -1654,6 +1667,7 @@ void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool
     if( bHome )
     {
         nScoreHome += nScoreValue;
+        m_nQuarterScoreHome += nScoreValue;
         ui->ledPointsHome->setText( QString::number( nScoreHome ) );
         on_pbGuestPlay_clicked();
         poSettings->setScore( bHome, nScoreHome );
@@ -1661,6 +1675,7 @@ void MainWindow::_updateScore(cPanelPlayer *poPlayerPanel, int nScoreValue, bool
     else
     {
         nScoreGuest += nScoreValue;
+        m_nQuarterScoreGuest += nScoreValue;
         ui->ledPointsGuest->setText( QString::number( nScoreGuest ) );
         on_pbHomePlay_clicked();
         poSettings->setScore( bHome, nScoreGuest );
@@ -1721,6 +1736,11 @@ void MainWindow::_setPlayerFault(bool bHome)
         else
         {
             pPlayer->setPlayerFault();
+            QStringList qslPlayer = QStringList() << QString::number( pPlayer->playerId() )
+                                                  << QString::number( pPlayer->playerNumber() )
+                                                  << pPlayer->playerName()
+                                                  << QString::number( pPlayer->playerFaults() );
+            poMinute->updatePlayer( (bHome ? cTeamType::HOME : cTeamType::GUEST), qslPlayer );
             _addMinuteAction( cMinActionType::MAT_PLAYER_FAULT_GAME, pPlayer->playerAndNumber(), bHome );
         }
 
@@ -1766,6 +1786,8 @@ void MainWindow::_addMinuteAction(cMinActionType::teAction p_teAction, QString p
     {
         QString qsAction        = QString( cMinActionType::toStr( p_teAction ) ).arg( p_qsParameter );
         int     nColumn         = ( bHome ? 0 : 2 );
+        int     nScoreH         = -1;
+        int     nScoreG         = -1;
 
         QTableWidgetItem *newItem = new QTableWidgetItem( qsAction );
         ui->tbMinute->setWordWrap( true );
@@ -1779,13 +1801,19 @@ void MainWindow::_addMinuteAction(cMinActionType::teAction p_teAction, QString p
             QTableWidgetItem *newScore = new QTableWidgetItem( QString("%1 - %2").arg( nScoreHome ).arg( nScoreGuest ) );
             newScore->setTextAlignment( Qt::AlignCenter|Qt::AlignHCenter );
             ui->tbMinute->setItem( m_nMinuteRowCount-1, 1, newScore );
+            nScoreH = nScoreHome;
+            nScoreG = nScoreGuest;
         }
         ui->tbMinute->resizeRowToContents( m_nMinuteRowCount-1 );
         ui->tbMinute->scrollToBottom();
         poMinute->addAction( nTimeMinuteMiliSec,
                              ( bHome ? cTeamType::HOME : cTeamType::GUEST ),
                              p_teAction,
-                             p_qsParameter );
+                             ui->ledCountQuarter->text().toInt(),
+                             p_qsParameter,
+                             nScoreH,
+                             nScoreG );
+        poMinute->updateScore( ui->ledCountQuarter->text().toInt(), m_nQuarterScoreHome, m_nQuarterScoreGuest );
     }
 }
 
@@ -1825,4 +1853,9 @@ bool MainWindow::_isPlayerNumberAssigned( bool bHome, int p_nNumber )
     }
 
     return false;
+}
+
+void MainWindow::on_pbReset_clicked()
+{
+
 }
