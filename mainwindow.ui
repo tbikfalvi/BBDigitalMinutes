@@ -1982,9 +1982,22 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_13">
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="pbMinuteAddCustomText">
+               <property name="toolTip">
+                <string>Add custom text to the minute ...</string>
+               </property>
                <property name="text">
-                <string>PushButton</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="bbdigitalminutes.qrc">
+                 <normaloff>:/resources/minutes_entry_add.png</normaloff>:/resources/minutes_entry_add.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>80</width>
+                 <height>80</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -2354,7 +2367,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pbCloseMinute">
+       <widget class="QPushButton" name="pbMinuteClose">
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2403,6 +2416,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_3">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2428,6 +2444,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2453,6 +2472,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_5">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2478,6 +2500,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_6">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>90</width>
@@ -2615,10 +2640,10 @@
   <tabstop>pbScore1Guest</tabstop>
   <tabstop>pbScore2Guest</tabstop>
   <tabstop>pbScore3Guest</tabstop>
-  <tabstop>pushButton</tabstop>
+  <tabstop>pbMinuteAddCustomText</tabstop>
   <tabstop>pbMinuteNew</tabstop>
   <tabstop>pbMinuteSave</tabstop>
-  <tabstop>pbCloseMinute</tabstop>
+  <tabstop>pbMinuteClose</tabstop>
   <tabstop>pb_3</tabstop>
   <tabstop>pb_4</tabstop>
   <tabstop>pb_5</tabstop>

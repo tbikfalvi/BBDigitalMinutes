@@ -30,6 +30,7 @@ cSettings::cSettings()
     m_bTimeOffenseUsed      = qsetApplication.value( "Game/OffenseTimeUsed",    false   ).toBool();
     m_nTimeOffense          = qsetApplication.value( "Game/OffenseTime",        24      ).toInt();
     m_nTimeOffenseExt       = qsetApplication.value( "Game/OffenseTimeExtend",  14      ).toInt();
+    m_bTimerAutoStopOnScore = qsetApplication.value( "Game/StopTimerOnScore",   true    ).toBool();
     m_bAutoSaveMinute       = qsetApplication.value( "Minute/AutoSaveEnabled",  false   ).toBool();
     m_nAutoSaveMinute       = qsetApplication.value( "Minute/AutoSaveMinute",   1       ).toInt();
 }
@@ -50,7 +51,7 @@ void cSettings::saveAppSettings()
     qsetApplication.setValue( "ReloadSizePos",          m_bReloadSizePos        );
     qsetApplication.setValue( "ReloadMinute",           m_bReloadMinute         );
     qsetApplication.setValue( "SoundEnabled",           m_bSoundEnabled         );
-//    qsetApplication.setValue( "MinuteClosed",           m_bIsMinuteClosed       );
+//  qsetApplication.setValue( "MinuteClosed",           m_bIsMinuteClosed       );
     qsetApplication.setValue( "MainWindow/Left",        m_nWindowLeft           );
     qsetApplication.setValue( "MainWindow/Top",         m_nWindowTop            );
     qsetApplication.setValue( "MainWindow/Width",       m_nWindowWidth          );
@@ -63,6 +64,7 @@ void cSettings::saveAppSettings()
     qsetApplication.setValue( "Game/OffenseTimeUsed",   m_bTimeOffenseUsed      );
     qsetApplication.setValue( "Game/OffenseTime",       m_nTimeOffense          );
     qsetApplication.setValue( "Game/OffenseTimeExtend", m_nTimeOffenseExt       );
+    qsetApplication.setValue( "Game/StopTimerOnScore",  m_bTimerAutoStopOnScore );
     qsetApplication.setValue( "Minute/AutoSaveEnabled", m_bAutoSaveMinute       );
     qsetApplication.setValue( "Minute/AutoSaveMinute",  m_nAutoSaveMinute       );
 }

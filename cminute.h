@@ -1,6 +1,7 @@
 #ifndef CMINUTE_H
 #define CMINUTE_H
 
+#include <QDomDocument>
 #include <QObject>
 #include <QString>
 
@@ -89,7 +90,7 @@ public:
 class cTeamType
 {
 public:
-    enum teAction
+    enum teType
     {
         HOME = 0,
         GUEST
@@ -117,10 +118,18 @@ public:
     void             saveMinute();
     void             closeMinute();
 
-    void             addAction( cMinActionType::teAction p_teAction, QString p_qsParameters = NULL );
+    void             addAction( int p_nTimeMilisec, cTeamType::teType p_teType, cMinActionType::teAction p_teAction, int p_nQuarter,
+                                QString p_qsParameters = NULL, int p_nScoreHome = -1, int p_nScoreGuest = -1 );
+    void             updateTeam( cTeamType::teType p_teType, QString p_qsName );
+    void             addPlayer( cTeamType::teType p_teType, QStringList p_qslPlayer );
+    void             updatePlayer( cTeamType::teType p_teType, QStringList p_qslPlayer );
+    void             deletePlayer( cTeamType::teType p_teType, QString p_qsPlayerId );
+    void             updateScore( int p_nQuarter, int p_nScoreHome, int p_nScoreGuest );
+    int              getQuarterScore(  cTeamType::teType p_teType, int p_nQuarter );
 
 private:
 
+    QDomDocument    *m_obDoc;
     bool             m_bIsMinuteClosed;
     QString          qsMinuteFileName;
     QString          qsMinuteName;

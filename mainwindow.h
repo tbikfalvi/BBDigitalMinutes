@@ -63,9 +63,10 @@ private slots:
     void on_pbSettings_clicked();
     void on_pbMinuteNew_clicked();
     void on_pbAttempt_clicked();
-    void on_pbCloseMinute_clicked();
-
+    void on_pbMinuteClose_clicked();
     void on_pbMinuteSave_clicked();
+    void on_pbReset_clicked();
+    void on_pbMinuteAddCustomText_clicked();
 
 private:
 
@@ -101,6 +102,9 @@ private:
     bool                     m_bGameInProgress;
     int                      m_nMinuteRowCount;
     int                      m_nTimerAutoSaveMinute;
+    int                      m_nPlayerId;
+    int                      m_nQuarterScoreHome;
+    int                      m_nQuarterScoreGuest;
 
     void                    _enableControls();
     void                    _updateMainPlayTime();
@@ -112,7 +116,7 @@ private:
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
     void                    _importPlayersFromFile();
-    void                    _addPlayerManually( bool addHome = true, bool addMultiplePlayers = false );
+    void                    _addPlayerManually(bool bHome = true, bool addMultiplePlayers = false );
     void                    _addPlayers( bool addHome = true );
     void                    _addPlayersToHome();
     void                    _addPlayersToGuest();
@@ -123,7 +127,7 @@ private:
     void                    _deletePlayer( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome = true );
-    void                    _processTeamNamePopupMenu( QLabel *poLblName );
+    void                    _processTeamNamePopupMenu( bool bHome = true );
     bool                    _isPlayerAllowedToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _selectPlayerFromField( bool bHome = true );
     void                    _selectPlayerFromSubstitute( bool bHome = true );
@@ -133,7 +137,9 @@ private:
     void                    _setPlayerFault( bool bHome = true );
     void                    _savePlayers( bool bHome = true );
     void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
-    void                    _resizeMinuteTableColumns();
+    void                    _updateTeamName( bool bHome = true, QString p_qsName = "" );
+    bool                    _isPlayerNumberAssigned(  bool bHome, int p_nNumber );
+
 };
 
 #endif // MAINWINDOW_H

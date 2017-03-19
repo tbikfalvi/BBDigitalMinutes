@@ -31,13 +31,20 @@ public:
     QLabel          *lblPlayerFault4;
     QLabel          *lblPlayerFault5;
 
-    cPanelPlayer( QWidget *p_poParent = 0, QString p_qsPlayerNumber = "", QString p_qsPlayerName = "" );
+    cPanelPlayer( QWidget *p_poParent = 0, int p_nPlayerId = 0, QString p_qsPlayerNumber = "", QString p_qsPlayerName = "" );
     ~cPanelPlayer();
 
-    int              playerNumber();
-    QString          playerName();
+    int              playerId()             {   return nPlayerId;                       }
+    int              playerNumber()         {   return nPlayerNumber;                   }
+    QString          playerName()           {   return qsPlayerName;                    }
+    int              playerFaults()         {   return nCountFaults;                    }
+    bool             isPlayerOnField()      {   return bPlayerOnField;                  }
+    bool             isEnabledToPlay()      {   return (nCountFaults<5?true:false);     }
+
     QString          playerWithNumber( QString p_qsSeparator = "\t" );
     QString          playerAndNumber();
+    QStringList      playerStringList();
+
     void             setPlayerNumber( int p_nPlayerNumber );
     void             setPlayerName( QString p_qsPlayerName );
     void             setPlayerToField();
@@ -46,9 +53,6 @@ public:
     void             increaseScore( int p_nScore );
     void             setPlayerFault();
 
-    int              playerFaults()                 {   return nCountFaults;                }
-    bool             isPlayerOnField()              {   return bPlayerOnField;              }
-    bool             isEnabledToPlay()              {   return (nCountFaults<5?true:false); }
 
 signals:
     void playerClicked( cPanelPlayer *poThis );
@@ -63,6 +67,7 @@ private:
     QString          qsFrmPlayerName;
     QString          qsLblPlayerName;
 
+    int              nPlayerId;
     int              nPlayerNumber;
     QString          qsPlayerName;
     bool             bPlayerOnField;
