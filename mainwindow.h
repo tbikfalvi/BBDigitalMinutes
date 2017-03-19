@@ -2,76 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QFrame>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QSystemTrayIcon>
 #include <QStringList>
-#include <QMouseEvent>
 #include <QSound>
 
-class cPanelPlayer : public QFrame
-{
-    Q_OBJECT
+#include "csettings.h"
+#include "cplayerpanel.h"
+#include "cminute.h"
 
-public:
-    QHBoxLayout     *hlPlayer;
-    QFrame          *frmPlayerNumber;
-    QLabel          *lblPlayerNumber;
-    QHBoxLayout     *hlPlayerName;
-    QFrame          *frmPlayerName;
-    QLabel          *lblPlayerName;
-    QHBoxLayout     *hlFault;
-    QFrame          *frmFault;
-    QLabel          *lblPlayerFault1;
-    QLabel          *lblPlayerFault2;
-    QLabel          *lblPlayerFault3;
-    QLabel          *lblPlayerFault4;
-    QLabel          *lblPlayerFault5;
-
-    cPanelPlayer( QWidget *p_poParent = 0, QString p_qsPlayerNumber = "", QString p_qsPlayerName = "" );
-    ~cPanelPlayer();
-
-    int              playerNumber();
-    QString          playerName();
-    QString          playerWithNumber( QString p_qsSeparator = "\t" );
-    void             setPlayerNumber( int p_nPlayerNumber );
-    void             setPlayerName( QString p_qsPlayerName );
-    void             setPlayerToField();
-    void             setPlayerToSubstitute();
-    void             removePlayer();
-    void             increaseScore( int p_nScore );
-    void             setPlayerFault();
-
-    bool             isPlayerOnField()              {   return bPlayerOnField;              }
-    bool             isEnabledToPlay()              {   return (nCountFaults<5?true:false); }
-
-signals:
-    void playerClicked( cPanelPlayer *poThis );
-    void playerDisqualified();
-
-protected:
-    void mousePressEvent ( QMouseEvent *p_poEvent );
-
-private:
-    QString          qsFrmPlayerNumber;
-    QString          qsLblPlayerNumber;
-    QString          qsFrmPlayerName;
-    QString          qsLblPlayerName;
-
-    int              nPlayerNumber;
-    QString          qsPlayerName;
-    bool             bPlayerOnField;
-    int              nScores;
-    int              nCountSingle;
-    int              nCountDouble;
-    int              nCountTriple;
-    int              nCountFaults;
-
-    void             increaseSingle()               {   nCountSingle++;                     }
-    void             increaseDouble()               {   nCountDouble++;                     }
-    void             increaseTriple()               {   nCountTriple++;                     }
-};
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+// Main window class
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
+//÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷÷
 
 namespace Ui { class MainWindow; }
 
@@ -85,6 +28,7 @@ public:
 
 protected:
     void timerEvent( QTimerEvent *p_poEvent );
+    void resizeEvent(QResizeEvent *event);
 
 private slots:
     void slotPlayerPanelHomeClicked( cPanelPlayer *poPlayerPanel );
@@ -97,8 +41,7 @@ private slots:
     void on_pbEditMainTime_clicked();
     void on_pbSaveMainTime_clicked();
     void on_pbCancelSaveMainTime_clicked();
-    void on_pbRequestTimeHome_clicked();
-    void on_pbRequestTimeGuest_clicked();
+    void on_pbRequestTime_clicked();
     void on_pbHomePlay_clicked();
     void on_pbGuestPlay_clicked();
     void on_pnIncreaseQuarter_clicked();
@@ -109,14 +52,21 @@ private slots:
     void on_pbEditTeamGuest_clicked();
     void on_pbPlayerChangeHome_clicked();
     void on_pbPlayerChangeGuest_clicked();
-    void on_pbScore1Home_clicked();
+/*    void on_pbScore1Home_clicked();
     void on_pbScore2Home_clicked();
     void on_pbScore3Home_clicked();
     void on_pbScore1Guest_clicked();
     void on_pbScore2Guest_clicked();
-    void on_pbScore3Guest_clicked();
+    void on_pbScore3Guest_clicked();*/
     void on_pbFaultHome_clicked();
     void on_pbFaultGuest_clicked();
+    void on_pbSettings_clicked();
+    void on_pbMinuteNew_clicked();
+    void on_pbAttempt_clicked();
+    void on_pbMinuteClose_clicked();
+    void on_pbMinuteSave_clicked();
+    void on_pbReset_clicked();
+    void on_pbMinuteAddCustomText_clicked();
 
 private:
 
@@ -129,32 +79,44 @@ private:
     cPanelPlayer            *pPlayerToSubstitute;
     cPanelPlayer            *pPlayerToField;
     QPoint                   posMenu;
+    cSettings               *poSettings;
+    cMinute                 *poMinute;
 
     QString                  qsTeamNameFromFile;
     int                      nTimerMainPlayTime;
     int                      nTimeMainMiliSec;
+    int                      nTimeMinuteMiliSec;
     int                      nTimerTimeDead;
     int                      nTimeDeadSecond;
     bool                     bTeamHomePlay;
     bool                     bTeamGuestPlay;
     int                      nTimerTeamPlayTime;
-    int                      nTimeTeamPlaySecond;
+    int                      nTimeOffense;
     int                      nCountPlayerFieldHome;
     int                      nCountPlayerFieldGuest;
     bool                     bSubstituteInProgress;
     int                      nScoreHome;
     int                      nScoreGuest;
+    bool                     m_bMinuteInProgress;
+    bool                     m_bSelectPlayersToField;
+    bool                     m_bGameInProgress;
+    int                      m_nMinuteRowCount;
+    int                      m_nTimerAutoSaveMinute;
+    int                      m_nPlayerId;
+    int                      m_nQuarterScoreHome;
+    int                      m_nQuarterScoreGuest;
 
+    void                    _enableControls();
     void                    _updateMainPlayTime();
-    void                    _updateTeamHomePlayTime();
-    void                    _updateTeamGuestPlayTime();
+    void                    _updateTeamHomeOffenseTime();
+    void                    _updateTeamGuestOffenseTime();
     void                    _updateDeadTime();
     void                    _resetDeadTime();
     void                    _showTrayInfo( QString p_qsMessage );
     void                    _showTrayWarning( QString p_qsMessage );
     void                    _showTrayError( QString p_qsMessage );
     void                    _importPlayersFromFile();
-    void                    _addPlayerManually( bool addHome = true, bool addMultiplePlayers = false );
+    void                    _addPlayerManually(bool bHome = true, bool addMultiplePlayers = false );
     void                    _addPlayers( bool addHome = true );
     void                    _addPlayersToHome();
     void                    _addPlayersToGuest();
@@ -165,13 +127,19 @@ private:
     void                    _deletePlayer( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _setPlayerToSubstitute( cPanelPlayer *poPlayerPanel, bool bHome = true );
-    void                    _processTeamNamePopupMenu( QLabel *poLblName );
+    void                    _processTeamNamePopupMenu( bool bHome = true );
     bool                    _isPlayerAllowedToField( cPanelPlayer *poPlayerPanel, bool bHome = true );
     void                    _selectPlayerFromField( bool bHome = true );
     void                    _selectPlayerFromSubstitute( bool bHome = true );
     void                    _increaseTeamScore( int nScoreValue, bool bHome = true );
+    void                    _increaseTeamScoreFault( bool bHome = true );
     void                    _updateScore( cPanelPlayer *poPlayerPanel, int nScoreValue, bool bHome = true );
     void                    _setPlayerFault( bool bHome = true );
+    void                    _savePlayers( bool bHome = true );
+    void                    _addMinuteAction( cMinActionType::teAction p_teAction, QString p_qsParameter = "", bool bHome = true );
+    void                    _updateTeamName( bool bHome = true, QString p_qsName = "" );
+    bool                    _isPlayerNumberAssigned(  bool bHome, int p_nNumber );
+
 };
 
 #endif // MAINWINDOW_H
