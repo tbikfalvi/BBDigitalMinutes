@@ -1,0 +1,10 @@
+Table of contents - Version 0.2.0
+
+- Import players from file
+Players for home and guest team can be imported from a tab separated text file.
+Every line in the file represent a player. 
+First data is the number of the player.
+Second data is the name of the player.
+The players can be defined in any order in the file.
+The application will sort them automatically by the order of their number.
+Application allow number duplicates, this should be elliminated later.

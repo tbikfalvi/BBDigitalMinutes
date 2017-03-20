@@ -1,0 +1,5 @@
+This file contains the description of the different versions.
+
+Version 0.1.0
+=============
+Initial version. Includes main window, base controls, base design.
